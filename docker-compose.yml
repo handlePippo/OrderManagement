@@ -82,7 +82,5 @@ services:
         condition: service_started
       product-api:
         condition: service_started
-      category-api:
-        condition: service_started
 volumes:
   mysql_data:
