@@ -1,0 +1,88 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: order-management-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: photosi
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  provisioner-api:
+    build: ./provisioner-api
+    container_name: provisioner-api
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MySql: server=mysql;port=3306;database=photosi;user=root;password=root
+      Jwt__Issuer: photosi
+      Jwt__Key: 09dbfbc3b7ddd8f2f26d1a5e66f1c51af0617d986ffd5b60206b400252a087b1
+    ports:
+      - 5001:8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  category-api:
+    build: ./category-api
+    container_name: category-api
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MySql: server=mysql;port=3306;database=photosi;user=root;password=root
+      Jwt__Issuer: photosi
+      Jwt__Key: 09dbfbc3b7ddd8f2f26d1a5e66f1c51af0617d986ffd5b60206b400252a087b1
+    ports:
+      - 5002:8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+      provisioner-api:
+        condition: service_started
+
+  product-api:
+    build: ./product-api
+    container_name: product-api
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MySql: server=mysql;port=3306;database=photosi;user=root;password=root
+      Jwt__Issuer: photosi
+      Jwt__Key: 09dbfbc3b7ddd8f2f26d1a5e66f1c51af0617d986ffd5b60206b400252a087b1
+    ports:
+      - 5003:8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+      provisioner-api:
+        condition: service_started
+      category-api:
+        condition: service_started
+
+  order-api:
+    build: ./order-api
+    container_name: order-api
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MySql: server=mysql;port=3306;database=photosi;user=root;password=root
+      Jwt__Issuer: photosi
+      Jwt__Key: 09dbfbc3b7ddd8f2f26d1a5e66f1c51af0617d986ffd5b60206b400252a087b1
+    ports:
+      - 5004:8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+      provisioner-api:
+        condition: service_started
+      product-api:
+        condition: service_started
+      category-api:
+        condition: service_started
+volumes:
+  mysql_data:

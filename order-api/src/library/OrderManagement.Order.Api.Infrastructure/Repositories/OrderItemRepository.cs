@@ -30,4 +30,9 @@ public sealed class OrderItemRepository : IOrderItemRepository
             .OrderItems
             .AddRangeAsync(dbEntities, cancellationToken);
     }
+
+    public Task DeleteByOrderIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }
