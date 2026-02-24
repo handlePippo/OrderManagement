@@ -1,9 +1,22 @@
 <img width="1208" height="416" alt="image" src="https://github.com/user-attachments/assets/bc351c88-e4f5-454d-9c31-536efa4c2f46" />
 
-# Questionnaire API
+# 📦 Order Management Microservices (.NET)
 
-QuestionnaireAPI è una Web API sviluppata in .NET, per esporre il questionario tecnico che mi avete fornito, tramite endpoint REST.
-Il progetto è strutturato con approccio DDD e Onion architecture (Domain, Application, Infrastructure, Api) e include gestione centralizzata delle eccezioni e test unitari.
+Minimal order management system built with .NET microservices architecture, designed to demonstrate service isolation, inter-service communication, and real-world ordering workflows.
+
+The system manages:
+
+👤 Users and address book
+
+🗂 Product categories
+
+📦 Products
+
+🧾 Orders and order items
+
+🌐 API Gateway for unified access
+
+Each domain is implemented as an independent microservice with its own DbContext and persistence boundary while sharing the same MySQL database. Cross-service relationships are enforced at the database level to maintain referential integrity without coupling services at code level.
 
 ---
 
