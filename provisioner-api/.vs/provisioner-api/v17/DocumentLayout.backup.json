@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\provisioner-api\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{529B959B-F751-D9A0-27FE-4AAF1BAFDD45}|src\\library\\OrderManagement.Provisioner.Api.Application\\OrderManagement.Provisioner.Api.Application.csproj|c:\\users\\filip\\onedrive\\desktop\\photosi-project\\provisioner-api\\src\\library\\ordermanagement.provisioner.api.application\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{529B959B-F751-D9A0-27FE-4AAF1BAFDD45}|src\\library\\OrderManagement.Provisioner.Api.Application\\OrderManagement.Provisioner.Api.Application.csproj|solutionrelative:src\\library\\ordermanagement.provisioner.api.application\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\provisioner-api\\src\\library\\OrderManagement.Provisioner.Api.Application\\Services\\UserService.cs",
+              "RelativeDocumentMoniker": "src\\library\\OrderManagement.Provisioner.Api.Application\\Services\\UserService.cs",
+              "ToolTip": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\provisioner-api\\src\\library\\OrderManagement.Provisioner.Api.Application\\Services\\UserService.cs",
+              "RelativeToolTip": "src\\library\\OrderManagement.Provisioner.Api.Application\\Services\\UserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T10:19:47.97Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

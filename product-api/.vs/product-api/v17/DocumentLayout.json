@@ -1,0 +1,88 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{529B959B-F751-D9A0-27FE-4AAF1BAFDD45}|src\\library\\OrderManagement.Product.Api.Application\\OrderManagement.Product.Api.Application.csproj|c:\\users\\filip\\onedrive\\desktop\\photosi-project\\product-api\\src\\library\\ordermanagement.product.api.application\\services\\productservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{529B959B-F751-D9A0-27FE-4AAF1BAFDD45}|src\\library\\OrderManagement.Product.Api.Application\\OrderManagement.Product.Api.Application.csproj|solutionrelative:src\\library\\ordermanagement.product.api.application\\services\\productservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3CE9C88-D94D-E494-D2F5-26483CB40F66}|src\\OrderManagement.Product.Api\\OrderManagement.Product.Api.csproj|c:\\users\\filip\\onedrive\\desktop\\photosi-project\\product-api\\src\\ordermanagement.product.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{F3CE9C88-D94D-E494-D2F5-26483CB40F66}|src\\OrderManagement.Product.Api\\OrderManagement.Product.Api.csproj|solutionrelative:src\\ordermanagement.product.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3CE9C88-D94D-E494-D2F5-26483CB40F66}|src\\OrderManagement.Product.Api\\OrderManagement.Product.Api.csproj|c:\\users\\filip\\onedrive\\desktop\\photosi-project\\product-api\\src\\ordermanagement.product.api\\controllers\\productcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3CE9C88-D94D-E494-D2F5-26483CB40F66}|src\\OrderManagement.Product.Api\\OrderManagement.Product.Api.csproj|solutionrelative:src\\ordermanagement.product.api\\controllers\\productcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3CE9C88-D94D-E494-D2F5-26483CB40F66}|src\\OrderManagement.Product.Api\\OrderManagement.Product.Api.csproj|c:\\users\\filip\\onedrive\\desktop\\photosi-project\\product-api\\src\\ordermanagement.product.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3CE9C88-D94D-E494-D2F5-26483CB40F66}|src\\OrderManagement.Product.Api\\OrderManagement.Product.Api.csproj|solutionrelative:src\\ordermanagement.product.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ProductService.cs",
+              "DocumentMoniker": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\src\\library\\OrderManagement.Product.Api.Application\\Services\\ProductService.cs",
+              "RelativeDocumentMoniker": "src\\library\\OrderManagement.Product.Api.Application\\Services\\ProductService.cs",
+              "ToolTip": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\src\\library\\OrderManagement.Product.Api.Application\\Services\\ProductService.cs",
+              "RelativeToolTip": "src\\library\\OrderManagement.Product.Api.Application\\Services\\ProductService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T10:17:07.593Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\src\\OrderManagement.Product.Api\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\OrderManagement.Product.Api\\appsettings.json",
+              "ToolTip": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\src\\OrderManagement.Product.Api\\appsettings.json",
+              "RelativeToolTip": "src\\OrderManagement.Product.Api\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-24T10:16:54.448Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\src\\OrderManagement.Product.Api\\Program.cs",
+              "RelativeDocumentMoniker": "src\\OrderManagement.Product.Api\\Program.cs",
+              "ToolTip": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\src\\OrderManagement.Product.Api\\Program.cs",
+              "RelativeToolTip": "src\\OrderManagement.Product.Api\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T10:15:28.732Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ProductController.cs",
+              "DocumentMoniker": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\src\\OrderManagement.Product.Api\\Controllers\\ProductController.cs",
+              "RelativeDocumentMoniker": "src\\OrderManagement.Product.Api\\Controllers\\ProductController.cs",
+              "ToolTip": "C:\\Users\\filip\\OneDrive\\Desktop\\photosi-project\\product-api\\src\\OrderManagement.Product.Api\\Controllers\\ProductController.cs",
+              "RelativeToolTip": "src\\OrderManagement.Product.Api\\Controllers\\ProductController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAADQAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T10:14:40.618Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

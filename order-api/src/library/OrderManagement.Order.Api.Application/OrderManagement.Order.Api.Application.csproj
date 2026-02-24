@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>OrderManagement.Order.Api.Application</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="15.0.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.9" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OrderManagement.Order.Api.Domain\OrderManagement.Order.Api.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
