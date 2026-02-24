@@ -1,5 +1,3 @@
-using OrderManagement.Order.Api.Domain.ValueObjects;
-
 namespace OrderManagement.Order.Api.Domain.Entities;
 
 /// <summary>
@@ -8,43 +6,71 @@ namespace OrderManagement.Order.Api.Domain.Entities;
 public sealed class OrderItem : EntityBase
 {
     /// <summary>
-    /// Order id.
+    /// Id.
     /// </summary>
-    public int OrderId { get; private set; }
+    public int Id { get; set; }
 
     /// <summary>
-    /// Product details.
+    /// Order id.
     /// </summary>
-    public OrderItemProductInfo ProductInfo { get; private set; } = null!;
+    public Guid OrderId { get; private set; }
+
+    /// <summary>
+    /// Product id.
+    /// </summary>
+    public int ProductId { get; init; }
+
+    /// <summary>
+    /// Qty.
+    /// </summary>
+    public int Quantity { get; set; }
+
+    /// <summary>
+    /// Product name.
+    /// </summary>
+    public string ProductName { get; set; } = null!;
+
+    /// <summary>
+    /// Unit price.
+    /// </summary>
+    public decimal UnitPrice { get; set; }
+
+    /// <summary>
+    /// Line total.
+    /// </summary>
+    public decimal LineTotal => UnitPrice * Quantity;
 
     /// <summary>
     /// Constructor for Automapper.
     /// </summary>
-    private OrderItem() { }
+    public OrderItem() { }
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="productId"></param>
     /// <param name="orderId"></param>
-    /// <param name="productInfo"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public OrderItem(int id, int orderId, OrderItemProductInfo productInfo)
-        : base(id)
+    public OrderItem(int productId, Guid orderId)
     {
+        ProductId = productId;
         OrderId = orderId;
-        ProductInfo = productInfo ?? throw new ArgumentNullException(nameof(productInfo));
     }
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="orderId"></param>
-    /// <param name="productInfo"></param>
+    /// <param name="productId"></param>
+    /// <param name="quantity"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public OrderItem(int orderId, OrderItemProductInfo productInfo)
+    public OrderItem(int productId, int quantity)
     {
-        OrderId = orderId;
-        ProductInfo = productInfo ?? throw new ArgumentNullException(nameof(productInfo));
+        ProductId = productId;
+        Quantity = quantity;
     }
+
+    /// <summary>
+    /// Marks the order modified.
+    /// </summary>
+    public void MarkModified() => ModifiedAt = DateTime.UtcNow;
 }

@@ -8,11 +8,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OrderManagement.Provisioner.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/users")]
     [Produces("application/json")]
     [Consumes("application/json")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : ControllerBase
     {
         private readonly IUserService _service;

@@ -14,7 +14,8 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<OrderEntity>
 
         b.Property(x => x.Id)
             .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .IsRequired()
+            .ValueGeneratedNever();
 
         b.Property(x => x.UserId)
             .HasColumnName("user_id")
@@ -37,6 +38,10 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<OrderEntity>
 
         b.OwnsOne(x => x.ShippingAddress, sa =>
         {
+            sa.Ignore(x => x.Id);
+
+            sa.Ignore(x => x.UserId);
+
             sa.Property(x => x.ShipAddress)
                 .HasColumnName("ship_address")
                 .HasMaxLength(100)

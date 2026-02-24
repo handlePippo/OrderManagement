@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OrderManagement.Provisioner.Api.Configuration.Middlewares;
+using System.Security.Claims;
 
 namespace OrderManagement.Provisioner.Api.Configuration
 {
@@ -24,7 +25,8 @@ namespace OrderManagement.Provisioner.Api.Configuration
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = jwtIssuer,
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromHexString(jwtKey!))
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromHexString(jwtKey!)),
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
 

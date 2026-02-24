@@ -20,7 +20,7 @@ namespace OrderManagement.Order.Api.Configuration
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (!context.ActionArguments.TryGetValue("id", out var value) || value is not int id)
+            if (!context.ActionArguments.TryGetValue("id", out var value) || value is not Guid id)
             {
                 context.Result = new ForbidResult();
                 return;

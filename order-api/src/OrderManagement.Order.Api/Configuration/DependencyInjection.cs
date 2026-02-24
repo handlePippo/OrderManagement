@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Configuration.Middlewares;
 using OrderManagement.Order.Api.Persistence.Clients;
+using OrderManagement.Order.Api.Persistence.Clients.Product;
+using OrderManagement.Order.Api.Persistence.Clients.Provisioner;
+using System.Security.Claims;
 
 namespace OrderManagement.Order.Api.Configuration
 {
@@ -21,12 +25,13 @@ namespace OrderManagement.Order.Api.Configuration
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = true,
+                        ValidateIssuer = false,
                         ValidateAudience = false,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = jwtIssuer,
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromHexString(jwtKey!))
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromHexString(jwtKey!)),
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
 
@@ -60,18 +65,32 @@ namespace OrderManagement.Order.Api.Configuration
             });
 
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
+            services.AddTransient<JwtForwardingHandler>();
             services.AddScoped<ValidateAuthorizationFilter>();
+            services.AddScoped<IProductApiClient, ProductApiClient>();
+            services.AddScoped<IProvisionerApiClient, ProvisionerApiClient>();
         }
 
         public static void AddOrderApiHttpClients(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<IProductApiClient, ProductApiClient>();
-            services.AddHttpClient<IProductApiClient, ProductApiClient>(c =>
-            {
-                c.BaseAddress = new Uri(configuration["ProductApi:BaseUrl"]!);
-                c.Timeout = TimeSpan.FromSeconds(10);
-            })
-            .AddStandardResilienceHandler();
+            // product-api
+            services.AddHttpClient(HttpClientNames.ProductApi)
+                .ConfigureHttpClient(c =>
+                {
+                    c.BaseAddress = new Uri(configuration["ProductApi:BaseUrl"]!);
+                    c.Timeout = TimeSpan.FromSeconds(10);
+                })
+                .AddStandardResilienceHandler();
+
+            // provisioner-api
+            services.AddHttpClient(HttpClientNames.ProvisionerApi)
+                .ConfigureHttpClient(c =>
+                {
+                    c.BaseAddress = new Uri(configuration["ProvisionerApi:BaseUrl"]!);
+                    c.Timeout = TimeSpan.FromSeconds(10);
+                })
+                .AddHttpMessageHandler<JwtForwardingHandler>()
+                .AddStandardResilienceHandler();
         }
 
         public static void ConfigureMiddlewares(this IApplicationBuilder app)

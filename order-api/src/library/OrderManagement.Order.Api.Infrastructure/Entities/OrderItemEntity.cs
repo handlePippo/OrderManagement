@@ -1,5 +1,3 @@
-using OrderManagement.Order.Api.Domain.ValueObjects;
-
 namespace OrderManagement.Order.Api.Persistence.Entities;
 
 /// <summary>
@@ -8,31 +6,32 @@ namespace OrderManagement.Order.Api.Persistence.Entities;
 public sealed class OrderItemEntity : EntityBase
 {
     /// <summary>
+    /// Id.
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Order id.
     /// </summary>
-    public int OrderId { get; private set; }
+    public Guid OrderId { get; private set; }
 
     /// <summary>
-    /// Product details.
+    /// Product id.
     /// </summary>
-    public OrderItemProductInfo ProductInfo { get; private set; } = null!;
+    public int ProductId { get; private init; }
 
     /// <summary>
-    /// Constructor for Automapper.
+    /// Quantity.
     /// </summary>
-    private OrderItemEntity() { }
+    public int Quantity { get; set; }
 
     /// <summary>
-    /// Constructor.
+    /// Product name.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="orderId"></param>
-    /// <param name="productInfo"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public OrderItemEntity(int id, int orderId, OrderItemProductInfo productInfo)
-        : base(id)
-    {
-        OrderId = orderId;
-        ProductInfo = productInfo ?? throw new ArgumentNullException(nameof(productInfo));
-    }
+    public string ProductName { get; set; } = null!;
+
+    /// <summary>
+    /// Unit price.
+    /// </summary>
+    public decimal UnitPrice { get; set; }
 }

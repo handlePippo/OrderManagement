@@ -1,14 +1,11 @@
 ﻿using AutoMapper;
 using OrderManagement.Order.Api.Application.DTOs.Orders;
-using OrderManagement.Order.Api.Application.DTOs.Orders.Create;
-using OrderManagement.Order.Api.Application.DTOs.Orders.Update;
 using OrderManagement.Order.Api.Application.Extensions;
 using OrderManagement.Order.Api.Application.Factories;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Application.Repositories;
 using OrderManagement.Order.Api.Domain.Entities;
 using OrderManagement.Order.Api.Domain.ValueObjects;
-using System.ComponentModel.DataAnnotations;
 
 namespace OrderManagement.Order.Api.Application.Services
 {
@@ -19,8 +16,9 @@ namespace OrderManagement.Order.Api.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IOrderItemRepository _orderItemRepository;
-        private readonly IProductCalculationsNormalizer _normalizer;
+        private readonly IOrderNormalizer _normalizer;
         private readonly IProductApiClient _productApiClient;
+        private readonly IProvisionerApiClient _provisionerApiClient;
         private int CurrentUserId => _currentUserProvider.GetLoggedUserId();
 
         /// <summary>
@@ -29,7 +27,10 @@ namespace OrderManagement.Order.Api.Application.Services
         /// <param name="mapper"></param>
         /// <param name="currentUserProvider"></param>
         /// <param name="repository"></param>
+        /// <param name="unitOfWork"></param>
+        /// <param name="orderItemRepository"></param>
         /// <param name="productApiClient"></param>
+        /// <param name="provisionerApiClient"></param>
         /// <param name="productCalculationsNormalizer"></param>
         public OrderService(
             IMapper mapper,
@@ -38,7 +39,8 @@ namespace OrderManagement.Order.Api.Application.Services
             IUnitOfWork unitOfWork,
             IOrderItemRepository orderItemRepository,
             IProductApiClient productApiClient,
-            IProductCalculationsNormalizer productCalculationsNormalizer)
+            IProvisionerApiClient provisionerApiClient,
+            IOrderNormalizer productCalculationsNormalizer)
         {
             _mapper = mapper;
             _orderRepository = repository;
@@ -46,6 +48,7 @@ namespace OrderManagement.Order.Api.Application.Services
             _unitOfWork = unitOfWork;
             _currentUserProvider = currentUserProvider;
             _productApiClient = productApiClient;
+            _provisionerApiClient = provisionerApiClient;
             _normalizer = productCalculationsNormalizer;
         }
 
@@ -60,12 +63,12 @@ namespace OrderManagement.Order.Api.Application.Services
             return _mapper.Map<IReadOnlyList<OrderDto>>(users);
         }
 
-        public async Task<bool> ExistsAsync(int id, CancellationToken cancellationToken)
+        public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)
         {
             return await _orderRepository.ExistsAsync(id, cancellationToken);
         }
 
-        public async Task<OrderDto?> GetAsync(int id, CancellationToken cancellationToken)
+        public async Task<OrderDto?> GetAsync(Guid id, CancellationToken cancellationToken)
         {
             var user = await _orderRepository.GetAsync(id, cancellationToken);
             if (user is null)
@@ -81,21 +84,19 @@ namespace OrderManagement.Order.Api.Application.Services
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            var productsInfo = _mapper.Map<IReadOnlyList<OrderItemProductInfo>>(dto.Items);
-            var shippingAddress = _mapper.Map<ShippingAddress>(dto.ShippingAddress);
-
-            var orderInfo = await GetTotals(productsInfo, token);
-            var order = OrderFactory.Create(CurrentUserId, shippingAddress, orderInfo.SubTotal, orderInfo.Total);
-
             await using var tx = await _unitOfWork.BeginTransactionAsync(token);
             try
             {
-                var orderId = await _orderRepository.AddAsync(order, token);
+                // Order
+                var normalizedOrder = await NormalizeOrderAsync(dto, token);
+                var order = OrderFactory.Create(CurrentUserId, normalizedOrder.ShippingAddress!, normalizedOrder.SubTotal, normalizedOrder.Total);
+                await _orderRepository.AddAsync(order, token);
 
-                var orderItemsProductInfo = _normalizer.NormalizeProductsInfo(orderInfo.Products, orderInfo.ItemsToBeAdded);
-                var orderItems = OrderItemFactory.Create(orderId, orderItemsProductInfo);
+                // OrderItems
+                var normalizedOrderItems = _normalizer.NormalizeOrderItems(order, normalizedOrder.Products, normalizedOrder.OrderItemsToBeProcessed);
+                await _orderItemRepository.AddRangeAsync(normalizedOrderItems, token);
 
-                await _orderItemRepository.AddRangeAsync(orderItems, token);
+                // Save and commit
                 await _unitOfWork.SaveChangesAsync(token);
                 await _unitOfWork.CommitAsync(token);
             }
@@ -106,7 +107,7 @@ namespace OrderManagement.Order.Api.Application.Services
             }
         }
 
-        public async Task DeleteAsync(int id, CancellationToken token = default)
+        public async Task DeleteAsync(Guid id, CancellationToken token = default)
         {
             var dbOrder = await _orderRepository.GetAsync(id, token)
                 ?? throw new InvalidOperationException("The requested order does not exists.");
@@ -117,7 +118,7 @@ namespace OrderManagement.Order.Api.Application.Services
             await _unitOfWork.SaveChangesAsync(token);
         }
 
-        public async Task UpdateAsync(int id, UpdateOrderDto dto, CancellationToken token)
+        public async Task UpdateAsync(Guid id, UpdateOrderDto dto, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
@@ -129,33 +130,27 @@ namespace OrderManagement.Order.Api.Application.Services
             await using var tx = await _unitOfWork.BeginTransactionAsync(token);
             try
             {
-                IReadOnlyList<OrderItem>? orderItems = null;
+                IReadOnlyList<OrderItem>? orderItemsToBeUpdated = null;
 
-                if (dto.Items is not null && dto.Items.Count == 0)
+                if (dto.Items?.Count == 0)
                 {
-                    throw new ValidationException("Items cannot be empty.");
+                    throw new InvalidOperationException("Items list cannot be empty.");
                 }
-                else if (dto.Items is not null)
+                else if (dto.Items?.Count > 0)
                 {
-                    var productsInfo = _mapper.Map<IReadOnlyList<OrderItemProductInfo>>(dto.Items);
+                    var normalizedOrder = await NormalizeOrderAsync(dto, token);
+                    order.ApplyPatchFrom(normalizedOrder.SubTotal, normalizedOrder.Total, normalizedOrder.ShippingAddress ?? order.ShippingAddress);
 
-                    var orderInfo = await GetTotals(productsInfo, token);
-
-                    order.SetTotals(orderInfo.SubTotal, orderInfo.Total);
-                    order.MarkModified();
-
-                    var orderItemsProductInfo = _normalizer.NormalizeProductsInfo(orderInfo.Products, orderInfo.ItemsToBeAdded);
-                    orderItems = OrderItemFactory.Create(id, orderItemsProductInfo);
+                    orderItemsToBeUpdated = _normalizer.NormalizeOrderItems(order, normalizedOrder.Products, normalizedOrder.OrderItemsToBeProcessed, true);
                 }
-
-                order.ApplyPatchFrom(dto, order.ShippingAddress);
-
+                
+                await _orderItemRepository.DeleteByOrderIdAsync(id, token);
                 await _orderRepository.UpdateAsync(order, token);
 
-                if (orderItems?.Count > 0)
+                if (orderItemsToBeUpdated?.Count > 0)
                 {
                     await _orderItemRepository.DeleteByOrderIdAsync(id, token);
-                    await _orderItemRepository.AddRangeAsync(orderItems, token);
+                    await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
                 }
 
                 await _unitOfWork.SaveChangesAsync(token);
@@ -170,16 +165,31 @@ namespace OrderManagement.Order.Api.Application.Services
 
         #region Private Methods
 
-        private async Task<OrderInfo> GetTotals(IReadOnlyList<OrderItemProductInfo> productsInfo, CancellationToken token)
+        private async Task<NormalizedOrder> NormalizeOrderAsync(CreateOrderDto requestDto, CancellationToken token)
+            => await NormalizeAsync(requestDto.Items, requestDto.AddressId, token);
+
+        private async Task<NormalizedOrder> NormalizeOrderAsync(UpdateOrderDto requestDto, CancellationToken token)
+            => await NormalizeAsync(requestDto.Items!, requestDto.AddressId, token);
+
+        private async Task<NormalizedOrder> NormalizeAsync(IReadOnlyList<OrderItemProductInfoDto> requestDto, int? shippingAddressId, CancellationToken token)
         {
-            var (itemsToBeAdded, idsOfItemsToBeAdded) = GetCompositeItems(productsInfo);
+            ArgumentNullException.ThrowIfNull(requestDto);
 
-            var products = await _productApiClient.GetRangeAsync(idsOfItemsToBeAdded, token)
-                ?? throw new InvalidOperationException("Failed to recover products.");
+            var bag = GetCompositeItems(requestDto);
 
-            var (subTotal, total) = _normalizer.NormalizeProductsCalculations(products, productsInfo);
+            var products = await _productApiClient.GetProductsAsync(new ProductRange(bag.ProductIds), token);
 
-            return new OrderInfo(subTotal, total, products, itemsToBeAdded);
+            var (subTotal, total) = _normalizer.NormalizeOrderItemsCalculations(products, bag.OrderItems);
+
+            ShippingAddress? shippingAddress = null;
+            if (shippingAddressId is int addressId)
+            {
+                shippingAddress = await _provisionerApiClient.GetShippingAddressAsync(addressId, token);
+                var user = await _provisionerApiClient.GetUserAsync(CurrentUserId, token);
+                shippingAddress.ShipPhoneNumber = user.PhoneNumber;
+            }
+
+            return new NormalizedOrder(subTotal, total, shippingAddress, products, bag.OrderItemsByIdAndQty);
         }
 
         private static void ValidateStatus(Domain.Entities.Order order)
@@ -192,22 +202,28 @@ namespace OrderManagement.Order.Api.Application.Services
             }
         }
 
-        private static (Dictionary<int, int>, IReadOnlyList<int>) GetCompositeItems(IReadOnlyList<OrderItemProductInfo> productsInfo)
+        private static CompositeBag GetCompositeItems(IReadOnlyList<OrderItemProductInfoDto> requestDto)
         {
-            var itemsToBeUpdated = productsInfo!
-                                    .GroupBy(i => i.ProductId)
-                                    .ToDictionary(g => g.Key, g => g
-                                    .Sum(x => x.Quantity));
+            var orderItems = requestDto
+                                .Select(i => new OrderItem(i.ProductId, i.Quantity))
+                                .ToList()
+                                .AsReadOnly();
 
-            var idsOfItemsToUpdated = itemsToBeUpdated
-                                                    .Keys
-                                                    .ToList()
-                                                    .AsReadOnly();
+            var orderItemsByIdAndQty = orderItems
+                                        .GroupBy(i => i.ProductId)
+                                        .ToDictionary(g => g.Key, g => g
+                                        .Sum(x => x.Quantity));
 
-            return (itemsToBeUpdated, idsOfItemsToUpdated);
+            var productsIds = orderItemsByIdAndQty
+                                .Keys
+                                .ToList()
+                                .AsReadOnly();
+
+            return new CompositeBag(orderItems, orderItemsByIdAndQty, productsIds);
         }
 
-        private sealed record OrderInfo(decimal SubTotal, decimal Total, IReadOnlyList<Product> Products, Dictionary<int, int> ItemsToBeAdded);
+        private readonly record struct NormalizedOrder(decimal SubTotal, decimal Total, ShippingAddress? ShippingAddress, IReadOnlyList<Product> Products, Dictionary<int, int> OrderItemsToBeProcessed);
+        private readonly record struct CompositeBag(IReadOnlyList<OrderItem> OrderItems, Dictionary<int, int> OrderItemsByIdAndQty, IReadOnlyList<int> ProductIds);
 
         #endregion
     }

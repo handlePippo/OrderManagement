@@ -20,38 +20,36 @@ public sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderItemE
             .HasColumnName("order_id")
             .IsRequired();
 
-        b.OwnsOne(x => x.ProductInfo, pi =>
-        {
-            pi.Property(x => x.ProductId)
-                .HasColumnName("product_id")
-                .IsRequired();
+        b.Property(x => x.ProductId)
+            .HasColumnName("product_id")
+            .IsRequired();
 
-            pi.Property(x => x.Quantity)
-                .HasColumnName("quantity")
-                .IsRequired();
+        b.Property(x => x.Quantity)
+            .HasColumnName("quantity")
+            .IsRequired();
 
-            pi.Property(x => x.ProductName)
-                .HasColumnName("product_name")
-                .HasMaxLength(200)
-                .IsRequired();
+        b.Property(x => x.ProductName)
+            .HasColumnName("product_name")
+            .HasMaxLength(200)
+            .IsRequired();
 
-            pi.Property(x => x.UnitPrice)
-                .HasColumnName("unit_price")
-                .HasPrecision(18, 2)
-                .IsRequired();
+        b.Property(x => x.UnitPrice)
+            .HasColumnName("unit_price")
+            .HasPrecision(18, 2)
+            .IsRequired();
 
-            pi.Property(x => x.LineTotal)
-                .HasColumnName("line_total")
-                .HasPrecision(18, 2)
-                .IsRequired();
+        b.Property(x => x.CreatedAt)
+            .HasColumnName("created_at")
+            .HasColumnType("datetime(6)")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
+            .IsRequired();
 
-            pi.HasIndex(x => x.ProductId)
-                .HasDatabaseName("ix_order_items_product_id");
+        b.Property(x => x.ModifiedAt)
+            .HasColumnName("modified_at")
+            .HasColumnType("datetime(6)");
 
-            pi.WithOwner();
-        });
-
-        b.Navigation(x => x.ProductInfo).IsRequired();
+        b.HasIndex(x => x.ProductId)
+            .HasDatabaseName("ix_order_items_product_id");
 
         b.HasIndex(x => x.OrderId)
             .HasDatabaseName("ix_order_items_order_id");

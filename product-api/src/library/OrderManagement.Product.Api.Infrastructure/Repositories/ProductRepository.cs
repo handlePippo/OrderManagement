@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.Product.Api.Application.Repositories;
+using OrderManagement.Product.Api.Domain.Entities;
 using OrderManagement.Product.Api.Infrastructure.Configuration;
 using OrderManagement.Product.Api.Infrastructure.Entities;
 
@@ -40,6 +41,17 @@ public sealed class ProductRepository : IProductRepository
                             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         return entity is null ? null : _mapper.Map<Domain.Entities.Product>(entity);
+    }
+
+    public async Task<IReadOnlyList<Domain.Entities.Product>> GetRangeAsync(GetProductRange range, CancellationToken cancellationToken = default)
+    {
+        var entities = await DbContext
+                            .Products
+                            .AsNoTracking()
+                            .Where(e => range.OrderIds.Contains(e.Id))
+                            .ToListAsync(cancellationToken);
+
+        return _mapper.Map<IReadOnlyList<Domain.Entities.Product>>(entities);
     }
 
     public Task<bool> ExistsAsync(int id, CancellationToken ct = default)

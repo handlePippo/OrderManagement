@@ -29,6 +29,19 @@ namespace OrderManagement.Product.Api.Application.Services
             return _mapper.Map<IReadOnlyList<ProductDto>>(products);
         }
 
+        public async Task<IReadOnlyList<ProductDto>> GetRangeAsync(GetProductRangeDto dto, CancellationToken token)
+        {
+            var range = _mapper.Map<Domain.Entities.GetProductRange>(dto);
+
+            var products = await _repository.GetRangeAsync(range, token);
+            if (products is null)
+            {
+                return Array.Empty<ProductDto>()!;
+            }
+
+            return _mapper.Map<IReadOnlyList<ProductDto>>(products);
+        }
+
         public async Task<ProductDto?> GetByIdAsync(int id, CancellationToken token)
         {
             var product = await _repository.GetAsync(id, token);

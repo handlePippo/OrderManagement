@@ -1,8 +1,8 @@
 ﻿namespace OrderManagement.Order.Api.Domain.Entities;
 
-public sealed class Product
+public sealed class Product : EntityBase
 {
-    public int Id { get; init; }
+    public int Id { get; set; }
     public int CategoryId { get; init; }
     public string Sku { get; init; } = null!;
     public string Name { get; init; } = null!;

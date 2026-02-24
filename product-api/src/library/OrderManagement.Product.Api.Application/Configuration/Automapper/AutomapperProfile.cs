@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using OrderManagement.Product.Api.Application.DTOs;
+using OrderManagement.Product.Api.Domain.Entities;
 
 namespace OrderManagement.Product.Api.Application.Configuration.Automapper
 {
@@ -23,6 +24,8 @@ namespace OrderManagement.Product.Api.Application.Configuration.Automapper
                 .ForMember(m => m.Id, opt => opt.Ignore())
                 .ForMember(m => m.CreatedAt, opt => opt.Ignore())
                 .ForMember(m => m.ModifiedAt, opt => opt.Ignore());
+
+            CreateMap<GetProductRangeDto, GetProductRange>();
         }
     }
 }

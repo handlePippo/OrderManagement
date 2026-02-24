@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OrderManagement.Order.Api.Application.DTOs.Orders.Create;
+namespace OrderManagement.Order.Api.Application.DTOs.Orders;
 
 public sealed record CreateOrderDto
 {
     [Required]  
-    public required CreateShippingAddressDto ShippingAddress { get; init; } = null!;
+    public required int AddressId { get; init; }
 
     [Required]
     [MinLength(1)]

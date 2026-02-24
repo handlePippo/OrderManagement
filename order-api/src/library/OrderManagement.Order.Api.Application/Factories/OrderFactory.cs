@@ -1,4 +1,5 @@
-﻿using OrderManagement.Order.Api.Domain.ValueObjects;
+﻿using OrderManagement.Order.Api.Domain.Entities;
+using OrderManagement.Order.Api.Domain.ValueObjects;
 
 namespace OrderManagement.Order.Api.Application.Factories
 {
@@ -9,6 +10,7 @@ namespace OrderManagement.Order.Api.Application.Factories
             ArgumentNullException.ThrowIfNull(shippingAddress);
 
             var order = new Domain.Entities.Order();
+            order.SetId(Guid.NewGuid());
             order.SetUserId(userId);
             order.SetStatus(OrderStatus.Pending);
             order.SetShippingAddress(shippingAddress);

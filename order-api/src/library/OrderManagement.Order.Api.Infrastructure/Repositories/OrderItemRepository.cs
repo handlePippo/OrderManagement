@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using OrderManagement.Order.Api.Application.Repositories;
 using OrderManagement.Order.Api.Persistence.Configuration;
 using OrderManagement.Order.Api.Persistence.Entities;
@@ -31,8 +32,14 @@ public sealed class OrderItemRepository : IOrderItemRepository
             .AddRangeAsync(dbEntities, cancellationToken);
     }
 
-    public Task DeleteByOrderIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DeleteByOrderIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+       var entity = await DbContext
+                            .OrderItems
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(o => o.OrderId == id, cancellationToken)
+                            ?? throw new InvalidOperationException($"Order with id {id} not found.");
+
+        DbContext.Remove(entity);
     }
 }

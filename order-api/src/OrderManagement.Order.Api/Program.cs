@@ -34,8 +34,6 @@ namespace OrderManagement.Order.Api
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
