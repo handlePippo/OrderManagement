@@ -4,8 +4,8 @@ USE `photosi`;
 -- USERS
 INSERT INTO `users` (`id`, `email`, `password_hash`, `phone_number`, `first_name`, `last_name`, `created_at`)
 VALUES
-  (1, 'admin@demo.com', 'HASH_ADMIN', '+391111111111', 'Admin', 'Demo', CURRENT_TIMESTAMP(6)),
-  (2, 'user@demo.com',  'HASH_USER',  '+392222222222', 'User',  'Demo', CURRENT_TIMESTAMP(6));
+  (1, 'admin@demo.com', 'YWRtaW4=', '+391111111111', 'Admin', 'Demo', CURRENT_TIMESTAMP(6)),
+  (2, 'user@demo.com',  'dGVzdA==',  '+392222222222', 'User',  'Demo', CURRENT_TIMESTAMP(6));
 
 -- ADDRESSES
 INSERT INTO `addresses` (`id`, `user_id`, `country_code`, `city`, `postal_code`, `street`, `created_at`)
