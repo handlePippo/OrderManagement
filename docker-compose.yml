@@ -18,6 +18,27 @@ services:
       retries: 30
       start_period: 20s
 
+  # gateway
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Docker
+    ports:
+      - 5000:8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+      provisioner-api:
+        condition: service_started
+      category-api:
+        condition: service_started
+      product-api:
+        condition: service_started
+      order-api:
+        condition: service_started
+
   # provisioner-api
   provisioner-api:
     build: ./provisioner-api
