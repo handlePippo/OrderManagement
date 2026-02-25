@@ -5,17 +5,17 @@ namespace OrderManagement.Gateway.Application.DTOs.Products;
 public record CreateProductDto
 {
     [Required]
-    public required int CategoryId { get; init; }
+    public required int CategoryId { get; set; }
 
     [Required]
-    public required string Sku { get; init; } = null!;
+    public required string Sku { get; set; } = null!;
 
     [Required]
-    public required string Name { get; init; } = null!;
+    public required string Name { get; set; } = null!;
 
     [Required]
-    public string? Description { get; init; }
+    public string? Description { get; set; }
 
     [Required]
-    public required decimal Price { get; init; }
+    public required decimal Price { get; set; }
 }

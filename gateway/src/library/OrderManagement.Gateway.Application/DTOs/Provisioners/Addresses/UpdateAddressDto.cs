@@ -2,9 +2,9 @@
 {
     public sealed record UpdateAddressDto
     {
-        public string? CountryCode { get; init; } = null!;
-        public string? City { get; init; } = null!;
-        public string? PostalCode { get; init; } = null!;
-        public string? Street { get; init; } = null!;
+        public string? CountryCode { get; set; } = null!;
+        public string? City { get; set; } = null!;
+        public string? PostalCode { get; set; } = null!;
+        public string? Street { get; set; } = null!;
     }
 }

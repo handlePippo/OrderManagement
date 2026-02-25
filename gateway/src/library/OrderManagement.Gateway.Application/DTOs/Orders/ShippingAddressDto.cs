@@ -2,10 +2,10 @@
 {
     public sealed record ShippingAddressDto
     {
-        public string ShipAddress { get; private set; } = null!;
-        public string ShipCity { get; private set; } = null!;
-        public string ShipPostalCode { get; private set; } = null!;
-        public string ShipCountryCode { get; private set; } = null!;
-        public string ShipPhoneNumber { get; private set; } = null!;
+        public string ShipAddress { get; set; } = null!;
+        public string ShipCity { get; set; } = null!;
+        public string ShipPostalCode { get; set; } = null!;
+        public string ShipCountryCode { get; set; } = null!;
+        public string ShipPhoneNumber { get; set; } = null!;
     }
 }

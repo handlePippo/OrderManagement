@@ -2,11 +2,11 @@
 {
     public record AddressDto : EntityBaseDto
     {
-        public int UserId { get; init; }
-        public string CountryCode { get; init; } = null!;
-        public string City { get; init; } = null!;
-        public string PostalCode { get; init; } = null!;
-        public string Street { get; init; } = null!;
+        public int UserId { get; set; }
+        public string CountryCode { get; set; } = null!;
+        public string City { get; set; } = null!;
+        public string PostalCode { get; set; } = null!;
+        public string Street { get; set; } = null!;
 
         public AddressDto(int id) : base(id) { }
     }

@@ -20,7 +20,7 @@ namespace OrderManagement.Category.Api.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet("list")]
         [ProducesResponseType(typeof(IReadOnlyList<CategoryDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IReadOnlyList<CategoryDto>>> ListAsync(CancellationToken token)

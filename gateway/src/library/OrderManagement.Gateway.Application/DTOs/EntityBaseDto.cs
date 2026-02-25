@@ -2,9 +2,9 @@
 {
     public abstract record EntityBaseDto
     {
-        public int Id { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? ModifiedAt { get; private set; }
+        public int Id { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
 
         protected EntityBaseDto(int id)
         {

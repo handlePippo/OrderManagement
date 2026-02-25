@@ -2,10 +2,10 @@
 {
     public sealed record UserDto : EntityBaseDto
     {
-        public required string Email { get; init; } = null!;
-        public required string FirstName { get; init; } = null!;
-        public required string LastName { get; init; } = null!;
-        public required string PhoneNumber { get; init; } = null!;
+        public required string Email { get; set; } = null!;
+        public required string FirstName { get; set; } = null!;
+        public required string LastName { get; set; } = null!;
+        public required string PhoneNumber { get; set; } = null!;
 
         public UserDto(int id) : base(id) { }
     }

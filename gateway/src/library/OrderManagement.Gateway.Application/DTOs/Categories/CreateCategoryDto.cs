@@ -5,5 +5,5 @@ namespace OrderManagement.Gateway.Application.DTOs.Categories;
 public record CreateCategoryDto
 {
     [Required]
-    public required string Name { get; init; } = null!;
+    public required string Name { get; set; } = null!;
 }

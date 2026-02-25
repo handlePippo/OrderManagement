@@ -1,10 +1,9 @@
 ﻿namespace OrderManagement.Gateway.Application.DTOs.Categories
 {
-    public sealed record CategoryDto
+    public sealed record CategoryDto : EntityBaseDto
     {
-        public int Id { get; private set; }
-        public string Name { get; private set; } = null!;
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? ModifiedAt { get; private set; }
+        public string Name { get; set; } = null!;
+
+        public CategoryDto(int id) : base(id) { }
     }
 }

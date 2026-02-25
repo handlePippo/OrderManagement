@@ -5,5 +5,5 @@ namespace OrderManagement.Gateway.Application.DTOs.Products;
 public record GetProductRangeDto
 {
     [Required]
-    public required IReadOnlyList<int> OrderIds { get; init; }
+    public required IReadOnlyList<int> OrderIds { get; set; }
 }

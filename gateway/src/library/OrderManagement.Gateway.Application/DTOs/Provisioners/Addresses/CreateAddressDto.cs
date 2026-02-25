@@ -5,15 +5,15 @@ namespace OrderManagement.Gateway.Application.DTOs.Provisioners.Addresses
     public sealed record CreateAddressDto
     {
         [Required]
-        public required string CountryCode { get; init; }
+        public required string CountryCode { get; set; }
 
         [Required]
-        public required string City { get; init; }
+        public required string City { get; set; }
 
         [Required]
-        public required string PostalCode { get; init; }
+        public required string PostalCode { get; set; }
 
         [Required]
-        public required string Street { get; init; }
+        public required string Street { get; set; }
     }
 }

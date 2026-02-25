@@ -5,8 +5,8 @@ namespace OrderManagement.Gateway.Application.DTOs.Orders;
 public sealed record OrderItemProductInfoDto
 {
     [Required]
-    public int ProductId { get; init; }
+    public int ProductId { get; set; }
 
     [Required]
-    public int Quantity { get; init; }
+    public int Quantity { get; set; }
 }
