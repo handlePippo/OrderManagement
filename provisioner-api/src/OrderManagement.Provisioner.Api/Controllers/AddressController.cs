@@ -34,6 +34,7 @@ namespace OrderManagement.Provisioner.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ServiceFilter(typeof(ValidateAddressAuthorizationFilter))]
         public async Task<ActionResult<AddressDto>> GetAsync([FromRoute] int id, CancellationToken token)
         {
             var dto = await _service.GetAsync(id, token);

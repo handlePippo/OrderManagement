@@ -19,8 +19,7 @@ namespace OrderManagement.Order.Api.Persistence.Migrations
                 name: "orders",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     user_id = table.Column<int>(type: "int", nullable: false),
                     status = table.Column<int>(type: "int", maxLength: 30, nullable: false),
                     subtotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -50,15 +49,14 @@ namespace OrderManagement.Order.Api.Persistence.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    order_id = table.Column<int>(type: "int", nullable: false),
+                    order_id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     product_id = table.Column<int>(type: "int", nullable: false),
                     quantity = table.Column<int>(type: "int", nullable: false),
                     product_name = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     unit_price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    line_total = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                    created_at = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    modified_at = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {

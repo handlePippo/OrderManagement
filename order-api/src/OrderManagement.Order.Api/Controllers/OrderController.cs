@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderManagement.Order.Api.Application.DTOs.Orders;
@@ -8,11 +7,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OrderManagement.Order.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/orders")]
     [Produces("application/json")]
     [Consumes("application/json")]
-    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _service;

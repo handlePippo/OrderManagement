@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OrderManagement.Product.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/products")]
     [Produces("application/json")]

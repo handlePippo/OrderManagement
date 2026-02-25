@@ -4,12 +4,13 @@ using OrderManagement.Order.Api.Application.Extensions;
 using OrderManagement.Order.Api.Application.Factories;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Application.Repositories;
+using OrderManagement.Order.Api.Application.Struct;
 using OrderManagement.Order.Api.Domain.Entities;
 using OrderManagement.Order.Api.Domain.ValueObjects;
 
 namespace OrderManagement.Order.Api.Application.Services
 {
-    public sealed class OrderService : IOrderService
+    public sealed partial class OrderService : IOrderService
     {
         private readonly IMapper _mapper;
         private readonly ICurrentUserProvider _currentUserProvider;
@@ -52,70 +53,75 @@ namespace OrderManagement.Order.Api.Application.Services
             _normalizer = productCalculationsNormalizer;
         }
 
+        public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken) => await _orderRepository.ExistsAsync(id, cancellationToken);
+
         public async Task<IReadOnlyList<OrderDto>> ListAsync(CancellationToken cancellationToken)
         {
-            var users = await _orderRepository.ListAsync(cancellationToken);
-            if (users is null)
+            var orders = await _orderRepository.ListAsync(cancellationToken);
+            if (orders is null)
             {
-                return null!;
+                return Array.Empty<OrderDto>()!;
             }
 
-            return _mapper.Map<IReadOnlyList<OrderDto>>(users);
-        }
+            var orderItemsIds = orders
+                .Select(o => o.Id)
+                .ToList()
+                .AsReadOnly();
 
-        public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)
-        {
-            return await _orderRepository.ExistsAsync(id, cancellationToken);
+            var orderItems = await _orderItemRepository.GetRangeByOrderIdAsync(orderItemsIds, cancellationToken);
+            if (orderItems is null)
+            {
+                return Array.Empty<OrderDto>()!;
+            }
+
+            foreach(var order in orders)
+            {
+                var targetOrderItems = orderItems
+                    .Where(i => i.OrderId == order.Id)
+                    .ToList()
+                    .AsReadOnly();
+
+                order.SetItems(targetOrderItems);
+            }
+
+            return _mapper.Map<IReadOnlyList<OrderDto>>(orders);
         }
 
         public async Task<OrderDto?> GetAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await _orderRepository.GetAsync(id, cancellationToken);
-            if (user is null)
+            var order = await _orderRepository.GetAsync(id, cancellationToken);
+            if (order is null)
             {
                 return null;
             }
 
-            return _mapper.Map<OrderDto>(user);
-        }
+            var orderItems = await _orderItemRepository.GetRangeByOrderIdAsync(id, cancellationToken);
+            if (orderItems is null)
+            {
+                return null;
+            }
 
+            order.SetItems(orderItems);
+
+            return _mapper.Map<OrderDto>(order);
+        }
 
         public async Task CreateAsync(CreateOrderDto dto, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            await using var tx = await _unitOfWork.BeginTransactionAsync(token);
-            try
-            {
-                // Order
-                var normalizedOrder = await NormalizeOrderAsync(dto, token);
-                var order = OrderFactory.Create(CurrentUserId, normalizedOrder.ShippingAddress!, normalizedOrder.SubTotal, normalizedOrder.Total);
-                await _orderRepository.AddAsync(order, token);
+            var normalizedOrderTask = NormalizeOrderAsync(dto, token);
+            var shippingAddressTask = GetShippingAddressAsync(dto.AddressId, token);
 
-                // OrderItems
-                var normalizedOrderItems = _normalizer.NormalizeOrderItems(order, normalizedOrder.Products, normalizedOrder.OrderItemsToBeProcessed);
-                await _orderItemRepository.AddRangeAsync(normalizedOrderItems, token);
+            await Task.WhenAll(normalizedOrderTask, shippingAddressTask);
 
-                // Save and commit
-                await _unitOfWork.SaveChangesAsync(token);
-                await _unitOfWork.CommitAsync(token);
-            }
-            catch
-            {
-                await _unitOfWork.RollbackAsync(token);
-                throw;
-            }
-        }
+            var normalizedOrder = normalizedOrderTask.GetAwaiter().GetResult();
+            var shippingAddress = shippingAddressTask.GetAwaiter().GetResult();
 
-        public async Task DeleteAsync(Guid id, CancellationToken token = default)
-        {
-            var dbOrder = await _orderRepository.GetAsync(id, token)
-                ?? throw new InvalidOperationException("The requested order does not exists.");
+            var order = OrderFactory.Create(CurrentUserId, shippingAddress, normalizedOrder.SubTotal, normalizedOrder.Total);
+            var orderItems = _normalizer.NormalizeOrderItems(order, normalizedOrder.Products, normalizedOrder.OrderItemsToBeProcessed);
 
-            ValidateStatus(dbOrder);
-
-            await _orderRepository.DeleteAsync(id, token);
-            await _unitOfWork.SaveChangesAsync(token);
+            await ExecuteCoordinatedCreateAsync(order, orderItems, token);
         }
 
         public async Task UpdateAsync(Guid id, UpdateOrderDto dto, CancellationToken token)
@@ -127,31 +133,47 @@ namespace OrderManagement.Order.Api.Application.Services
 
             ValidateStatus(order);
 
+            if (dto.Items is not null && dto.Items.Count == 0)
+            {
+                throw new InvalidOperationException("Items list cannot be empty.");
+            }
+
+            var (orderItems, executeUpdate) = await UpdateAsync(dto, order, token);
+
+            if (executeUpdate)
+            {
+                await using var tx = await _unitOfWork.BeginTransactionAsync(token);
+                try
+                {
+                    await ExecuteCoordinatedUpdateAsync(order, orderItems, token);
+                }
+                catch
+                {
+                    await _unitOfWork.RollbackAsync(token);
+                    throw;
+                }
+            }
+        }
+
+        public async Task DeleteAsync(Guid id, CancellationToken token = default)
+        {
+            var dbOrder = await _orderRepository.GetAsync(id, token)
+                ?? throw new InvalidOperationException("The requested order does not exists.");
+
+            ValidateStatus(dbOrder);
+
+            await ExecuteCoordinatedDeleteAsync(id, token);
+        }
+
+        #region UoW handlers
+
+        private async Task ExecuteCoordinatedCreateAsync(Domain.Entities.Order order, IReadOnlyList<OrderItem> orderItemsToBeUpdated, CancellationToken token)
+        {
             await using var tx = await _unitOfWork.BeginTransactionAsync(token);
             try
             {
-                IReadOnlyList<OrderItem>? orderItemsToBeUpdated = null;
-
-                if (dto.Items?.Count == 0)
-                {
-                    throw new InvalidOperationException("Items list cannot be empty.");
-                }
-                else if (dto.Items?.Count > 0)
-                {
-                    var normalizedOrder = await NormalizeOrderAsync(dto, token);
-                    order.ApplyPatchFrom(normalizedOrder.SubTotal, normalizedOrder.Total, normalizedOrder.ShippingAddress ?? order.ShippingAddress);
-
-                    orderItemsToBeUpdated = _normalizer.NormalizeOrderItems(order, normalizedOrder.Products, normalizedOrder.OrderItemsToBeProcessed, true);
-                }
-                
-                await _orderItemRepository.DeleteByOrderIdAsync(id, token);
-                await _orderRepository.UpdateAsync(order, token);
-
-                if (orderItemsToBeUpdated?.Count > 0)
-                {
-                    await _orderItemRepository.DeleteByOrderIdAsync(id, token);
-                    await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
-                }
+                await _orderRepository.AddAsync(order, token);
+                await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
 
                 await _unitOfWork.SaveChangesAsync(token);
                 await _unitOfWork.CommitAsync(token);
@@ -163,15 +185,72 @@ namespace OrderManagement.Order.Api.Application.Services
             }
         }
 
+        private async Task ExecuteCoordinatedUpdateAsync(Domain.Entities.Order order, IReadOnlyList<OrderItem> orderItemsToBeUpdated, CancellationToken token)
+        {
+            await _orderRepository.UpdateAsync(order, token);
+
+            if (orderItemsToBeUpdated?.Count > 0)
+            {
+                await _orderItemRepository.DeleteRangeByOrderIdAsync(order.Id, token);
+                await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
+            }
+
+            await _unitOfWork.SaveChangesAsync(token);
+            await _unitOfWork.CommitAsync(token);
+        }
+
+        private async Task ExecuteCoordinatedDeleteAsync(Guid orderId, CancellationToken token)
+        {
+            await using var tx = await _unitOfWork.BeginTransactionAsync(token);
+            try
+            {
+                await _orderItemRepository.DeleteRangeByOrderIdAsync(orderId, token);
+                await _orderRepository.DeleteAsync(orderId, token);
+
+                await _unitOfWork.SaveChangesAsync(token);
+                await _unitOfWork.CommitAsync(token);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync(token);
+                throw;
+            }
+        }
+
+        #endregion
+
         #region Private Methods
 
+        private async Task<(IReadOnlyList<OrderItem>, bool)> UpdateAsync(UpdateOrderDto dto, Domain.Entities.Order order, CancellationToken token)
+        {
+            IReadOnlyList<OrderItem> orderItemsToBeUpdated = [];
+            var executeUpdate = false;
+
+            if (dto.Items?.Count > 0)
+            {
+                var normalizedOrder = await NormalizeOrderAsync(dto, token);
+                order.ApplyPatchFrom(normalizedOrder.SubTotal, normalizedOrder.Total);
+                orderItemsToBeUpdated = _normalizer.NormalizeOrderItems(order, normalizedOrder.Products, normalizedOrder.OrderItemsToBeProcessed, true);
+                executeUpdate = true;
+            }
+
+            if (dto.AddressId is int addressId && addressId > 0)
+            {
+                var shippingAddress = await GetShippingAddressAsync(addressId, token);
+                order.ApplyPatchFrom(shippingAddress);
+                executeUpdate = true;
+            }
+
+            return (orderItemsToBeUpdated, executeUpdate);
+        }
+
         private async Task<NormalizedOrder> NormalizeOrderAsync(CreateOrderDto requestDto, CancellationToken token)
-            => await NormalizeAsync(requestDto.Items, requestDto.AddressId, token);
+            => await NormalizeAsync(requestDto.Items, token);
 
         private async Task<NormalizedOrder> NormalizeOrderAsync(UpdateOrderDto requestDto, CancellationToken token)
-            => await NormalizeAsync(requestDto.Items!, requestDto.AddressId, token);
+            => await NormalizeAsync(requestDto.Items!, token);
 
-        private async Task<NormalizedOrder> NormalizeAsync(IReadOnlyList<OrderItemProductInfoDto> requestDto, int? shippingAddressId, CancellationToken token)
+        private async Task<NormalizedOrder> NormalizeAsync(IReadOnlyList<OrderItemProductInfoDto> requestDto, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(requestDto);
 
@@ -181,25 +260,28 @@ namespace OrderManagement.Order.Api.Application.Services
 
             var (subTotal, total) = _normalizer.NormalizeOrderItemsCalculations(products, bag.OrderItems);
 
-            ShippingAddress? shippingAddress = null;
-            if (shippingAddressId is int addressId)
+            return new NormalizedOrder() with
             {
-                shippingAddress = await _provisionerApiClient.GetShippingAddressAsync(addressId, token);
-                var user = await _provisionerApiClient.GetUserAsync(CurrentUserId, token);
-                shippingAddress.ShipPhoneNumber = user.PhoneNumber;
-            }
-
-            return new NormalizedOrder(subTotal, total, shippingAddress, products, bag.OrderItemsByIdAndQty);
+                SubTotal = subTotal,
+                Total = total,
+                Products = products,
+                OrderItemsToBeProcessed = bag.OrderItemsByIdAndQty
+            };
         }
 
-        private static void ValidateStatus(Domain.Entities.Order order)
+        private async Task<ShippingAddress> GetShippingAddressAsync(int addressId, CancellationToken token)
         {
-            ArgumentNullException.ThrowIfNull(order);
+            var shippingAddressTask = _provisionerApiClient.GetShippingAddressAsync(addressId, token);
+            var userTask = _provisionerApiClient.GetUserAsync(CurrentUserId, token);
 
-            if (order.Status != OrderStatus.Pending)
-            {
-                throw new InvalidOperationException("Is not possible to edit an order that is not in pending status.");
-            }
+            await Task.WhenAll(shippingAddressTask, userTask);
+
+            var shippingAddress = shippingAddressTask.GetAwaiter().GetResult();
+            var user = userTask.GetAwaiter().GetResult();
+
+            shippingAddress.ShipPhoneNumber = user.PhoneNumber;
+
+            return shippingAddress;
         }
 
         private static CompositeBag GetCompositeItems(IReadOnlyList<OrderItemProductInfoDto> requestDto)
@@ -219,11 +301,23 @@ namespace OrderManagement.Order.Api.Application.Services
                                 .ToList()
                                 .AsReadOnly();
 
-            return new CompositeBag(orderItems, orderItemsByIdAndQty, productsIds);
+            return new CompositeBag() with
+            {
+                OrderItems = orderItems,
+                OrderItemsByIdAndQty = orderItemsByIdAndQty,
+                ProductIds = productsIds
+            };
         }
 
-        private readonly record struct NormalizedOrder(decimal SubTotal, decimal Total, ShippingAddress? ShippingAddress, IReadOnlyList<Product> Products, Dictionary<int, int> OrderItemsToBeProcessed);
-        private readonly record struct CompositeBag(IReadOnlyList<OrderItem> OrderItems, Dictionary<int, int> OrderItemsByIdAndQty, IReadOnlyList<int> ProductIds);
+        private static void ValidateStatus(Domain.Entities.Order order)
+        {
+            ArgumentNullException.ThrowIfNull(order);
+
+            if (order.Status != OrderStatus.Pending)
+            {
+                throw new InvalidOperationException("Is not possible to edit an order that is not in pending status.");
+            }
+        }
 
         #endregion
     }

@@ -10,7 +10,7 @@ namespace OrderManagement.Order.Api.Application.DTOs.Orders
         public decimal Subtotal { get; init; }
         public decimal Total { get; init; }
         public ShippingAddressDto ShippingAddress { get; init; } = null!;
-        public IReadOnlyList<OrderItemDto> Items { get; init; } = Array.Empty<OrderItemDto>()!;
+        public IReadOnlyList<OrderItemOutDto> Items { get; init; } = Array.Empty<OrderItemOutDto>()!;
         public DateTime CreatedAt { get; private set; }
         public DateTime? ModifiedAt { get; private set; }
 

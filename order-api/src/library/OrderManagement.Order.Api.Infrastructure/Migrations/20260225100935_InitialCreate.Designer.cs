@@ -12,7 +12,7 @@ using OrderManagement.Order.Api.Persistence.Configuration;
 namespace OrderManagement.Order.Api.Persistence.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20260222185113_InitialCreate")]
+    [Migration("20260225100935_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,12 +27,9 @@ namespace OrderManagement.Order.Api.Persistence.Migrations
 
             modelBuilder.Entity("OrderManagement.Order.Api.Persistence.Entities.OrderEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -81,29 +78,55 @@ namespace OrderManagement.Order.Api.Persistence.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
                     b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("modified_at");
 
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int")
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("char(36)")
                         .HasColumnName("order_id");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int")
+                        .HasColumnName("product_id");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("product_name");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("unit_price");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .HasDatabaseName("ix_order_items_order_id");
 
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("ix_order_items_product_id");
+
                     b.ToTable("order_items", (string)null);
                 });
 
             modelBuilder.Entity("OrderManagement.Order.Api.Persistence.Entities.OrderEntity", b =>
                 {
-                    b.OwnsOne("OrderManagement.Order.Api.Domain.ValueObjects.ShippingAddress", "ShippingAddress", b1 =>
+                    b.OwnsOne("OrderManagement.Order.Api.Domain.Entities.ShippingAddress", "ShippingAddress", b1 =>
                         {
-                            b1.Property<int>("OrderEntityId")
-                                .HasColumnType("int");
+                            b1.Property<Guid>("OrderEntityId")
+                                .HasColumnType("char(36)");
 
                             b1.Property<string>("ShipAddress")
                                 .IsRequired()
@@ -153,49 +176,6 @@ namespace OrderManagement.Order.Api.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("OrderManagement.Order.Api.Domain.ValueObjects.OrderItemProductInfo", "ProductInfo", b1 =>
-                        {
-                            b1.Property<int>("OrderItemEntityId")
-                                .HasColumnType("int");
-
-                            b1.Property<decimal>("LineTotal")
-                                .HasPrecision(18, 2)
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("line_total");
-
-                            b1.Property<int>("ProductId")
-                                .HasColumnType("int")
-                                .HasColumnName("product_id");
-
-                            b1.Property<string>("ProductName")
-                                .IsRequired()
-                                .HasMaxLength(200)
-                                .HasColumnType("varchar(200)")
-                                .HasColumnName("product_name");
-
-                            b1.Property<int>("Quantity")
-                                .HasColumnType("int")
-                                .HasColumnName("quantity");
-
-                            b1.Property<decimal>("UnitPrice")
-                                .HasPrecision(18, 2)
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("unit_price");
-
-                            b1.HasKey("OrderItemEntityId");
-
-                            b1.HasIndex("ProductId")
-                                .HasDatabaseName("ix_order_items_product_id");
-
-                            b1.ToTable("order_items");
-
-                            b1.WithOwner()
-                                .HasForeignKey("OrderItemEntityId");
-                        });
-
-                    b.Navigation("ProductInfo")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

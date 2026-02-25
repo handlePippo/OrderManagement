@@ -13,6 +13,21 @@ namespace OrderManagement.Provisioner.Api.Persistence.Extensions
         /// <param name="user"></param>
         /// <returns></returns>
         /// <exception cref="UnauthorizedAccessException"></exception>
+        public static bool IsAdmin(this ClaimsPrincipal user)
+        {
+            ArgumentNullException.ThrowIfNull(user);
+
+            var userId = user.FindFirst(ClaimTypes.Role)?.Value;
+
+            return userId == "Admin";
+        }
+
+        /// <summary>
+        /// Gets the user id.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizedAccessException"></exception>
         public static int GetLoggedUserId(this ClaimsPrincipal user)
         {
             ArgumentNullException.ThrowIfNull(user);

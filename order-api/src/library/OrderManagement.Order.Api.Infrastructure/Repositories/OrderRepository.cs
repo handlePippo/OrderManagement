@@ -30,13 +30,24 @@ public sealed class OrderRepository : IOrderRepository
 
     public async Task<IReadOnlyList<Domain.Entities.Order>> ListAsync(CancellationToken cancellationToken = default)
     {
-        var dbEntities = await DbContext
-                                .Orders
-                                .Where(o => o.UserId == CurrentUserId)
-                                .AsNoTracking()
-                                .ToListAsync(cancellationToken);
+        IReadOnlyList<OrderEntity> entities;
+        if (_currentUserProvider.IsAdmin)
+        {
+            entities = await DbContext
+                                      .Orders
+                                      .AsNoTracking()
+                                      .ToListAsync(cancellationToken);
+        }
+        else
+        {
+            entities = await DbContext
+                                      .Orders
+                                      .Where(o => o.UserId == CurrentUserId)
+                                      .AsNoTracking()
+                                      .ToListAsync(cancellationToken);
+        }
 
-        return _mapper.Map<IReadOnlyList<Domain.Entities.Order>>(dbEntities);
+        return _mapper.Map<IReadOnlyList<Domain.Entities.Order>>(entities);
     }
 
     public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)

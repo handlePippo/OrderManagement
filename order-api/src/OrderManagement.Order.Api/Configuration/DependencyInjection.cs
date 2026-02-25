@@ -64,6 +64,7 @@ namespace OrderManagement.Order.Api.Configuration
                 });
             });
 
+            services.AddMemoryCache();
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
             services.AddTransient<JwtForwardingHandler>();
             services.AddScoped<ValidateAuthorizationFilter>();

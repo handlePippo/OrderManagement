@@ -14,8 +14,7 @@ namespace OrderManagement.Order.Api.Application.Configuration.Automapper
         private void ConfigureOrderMapping()
         {
             // DTO -> Domain
-            CreateMap<OrderDto, Domain.Entities.Order>().ReverseMap();
-            CreateMap<OrderItemDto, OrderItem>()
+            CreateMap<OrderItemInDto, OrderItem>()
                 .ForMember(d => d.ProductId, opt => opt.MapFrom(s => s.ProductInfo.ProductId))
                 .ForMember(d => d.Quantity, opt => opt.MapFrom(s => s.ProductInfo.Quantity))
                 .ForMember(d => d.ProductName, opt => opt.Ignore())
@@ -25,15 +24,18 @@ namespace OrderManagement.Order.Api.Application.Configuration.Automapper
                 .ForMember(m => m.ModifiedAt, opt => opt.Ignore());
 
             // Domain -> DTO
-            CreateMap<OrderItem, OrderItemDto>()
-                .ConstructUsing(s => new OrderItemDto(s.Id, s.OrderId))
+            CreateMap<OrderItem, OrderItemInDto>()
+                .ConstructUsing(s => new OrderItemInDto(s.Id, s.OrderId))
                 .ForMember(d => d.ProductInfo, opt => opt.MapFrom(s => new OrderItemProductInfoDto
                 {
                     ProductId = s.ProductId,
                     Quantity = s.Quantity
                 }));
 
+            CreateMap<OrderItem, OrderItemOutDto>();
+
             // Both
+            CreateMap<OrderDto, Domain.Entities.Order>().ReverseMap();
             CreateMap<ShippingAddressDto, ShippingAddress>().ReverseMap();
         }
     }

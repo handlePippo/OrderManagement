@@ -23,7 +23,6 @@ namespace OrderManagement.Provisioner.Api.Controllers
 
 
         [HttpGet("list")]
-        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

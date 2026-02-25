@@ -1,11 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace OrderManagement.Order.Api.Application.DTOs.Orders;
 
-public sealed record OrderItemDto : EntityBaseDto
+public sealed record OrderItemInDto : EntityBaseDto
 {
     public Guid OrderId { get; private set; }
     public OrderItemProductInfoDto ProductInfo { get; init; } = null!;
 
-    public OrderItemDto(int id, Guid orderId)
+    public OrderItemInDto(int id, Guid orderId)
         : base(id)
     {
         OrderId = orderId;

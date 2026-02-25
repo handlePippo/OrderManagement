@@ -59,6 +59,7 @@ namespace OrderManagement.Provisioner.Api.Configuration
                 });
             });
 
+            services.AddMemoryCache();
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
             services.AddScoped<ValidateUserAuthorizationFilter>();
             services.AddScoped<ValidateAddressAuthorizationFilter>();
