@@ -10,7 +10,7 @@ namespace OrderManagement.Provisioner.Api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/address")]
+    [Route("api/addresses")]
     public class AddressController : ControllerBase
     {
         private readonly IAddressService _service;

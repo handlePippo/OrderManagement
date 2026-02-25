@@ -21,7 +21,6 @@ namespace OrderManagement.Provisioner.Api.Controllers
             _service = service;
         }
 
-
         [HttpGet("list")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using OrderManagement.Provisioner.Api.Application.Interfaces;
 using OrderManagement.Provisioner.Api.Application.Repositories;
 using OrderManagement.Provisioner.Api.Domain.Entities;
 using OrderManagement.Provisioner.Api.Domain.ValueObjects;
@@ -15,24 +16,40 @@ public sealed class UserRepository : IUserRepository
 {
     private readonly UserDbContext DbContext;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserProvider _currentUserProvider;
+
+    private int CurrentUserId => _currentUserProvider.GetLoggedUserId();
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="dbContext"></param>
     /// <param name="mapper"></param>
-    public UserRepository(UserDbContext dbContext, IMapper mapper)
+    public UserRepository(UserDbContext dbContext, IMapper mapper, ICurrentUserProvider currentUserProvider)
     {
         DbContext = dbContext;
         _mapper = mapper;
+        _currentUserProvider = currentUserProvider;
     }
 
     public async Task<IReadOnlyList<User>> ListAsync(CancellationToken cancellationToken = default)
     {
-        var entities = await DbContext
-                            .Users
-                            .AsNoTracking()
-                            .ToListAsync(cancellationToken);
+        IReadOnlyList<UserEntity> entities;
+        if (_currentUserProvider.IsAdmin)
+        {
+            entities = await DbContext
+                .Users
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
+        else
+        {
+            entities = await DbContext
+                .Users
+                .AsNoTracking()
+                .Where(u => u.Id == CurrentUserId)
+                .ToListAsync(cancellationToken);
+        }
 
         return _mapper.Map<IReadOnlyList<User>>(entities);
     }

@@ -1,5 +1,4 @@
-﻿using OrderManagement.Order.Api.Application.DTOs.Orders;
-using OrderManagement.Order.Api.Domain.Entities;
+﻿using OrderManagement.Order.Api.Domain.Entities;
 
 namespace OrderManagement.Order.Api.Application.Extensions
 {

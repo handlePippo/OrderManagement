@@ -39,7 +39,7 @@ namespace OrderManagement.Provisioner.Api.Configuration
                 return address?.UserId;
             });
 
-            if (cachedUserId is null || cachedUserId.Value != _currentUserProvider.GetLoggedUserId())
+            if (cachedUserId is null || (cachedUserId.Value != _currentUserProvider.GetLoggedUserId() && !_currentUserProvider.IsAdmin))
             {
                 context.Result = new ForbidResult();
                 return;

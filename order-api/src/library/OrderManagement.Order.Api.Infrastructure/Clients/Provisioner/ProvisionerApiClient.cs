@@ -18,7 +18,7 @@ public sealed class ProvisionerApiClient : IProvisionerApiClient
 
     public async Task<ShippingAddress> GetShippingAddressAsync(int id, CancellationToken ct)
     {
-        var response = await _httpClient.GetAsync($"api/address/{id}", ct);
+        var response = await _httpClient.GetAsync($"api/addresses/{id}", ct);
 
         if (!response.IsSuccessStatusCode)
         {

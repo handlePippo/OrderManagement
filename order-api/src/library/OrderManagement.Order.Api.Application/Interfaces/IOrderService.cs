@@ -4,11 +4,11 @@ namespace OrderManagement.Order.Api.Application.Interfaces
 {
     public interface IOrderService
     {
-        Task<IReadOnlyList<OrderDto>> ListAsync(CancellationToken cancellationToken = default);
-        Task<OrderDto?> GetAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
-        Task CreateAsync(CreateOrderDto entity, CancellationToken cancellationToken = default);
-        Task UpdateAsync(Guid id, UpdateOrderDto entity, CancellationToken cancellationToken = default);
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<OrderDto>> ListAsync(CancellationToken cancellationToken);
+        Task<OrderDto?> GetAsync(Guid id, CancellationToken cancellationToken);
+        Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken);
+        Task CreateAsync(CreateOrderDto entity, CancellationToken cancellationToken);
+        Task UpdateAsync(Guid id, UpdateOrderDto entity, CancellationToken cancellationToken);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
     }
 }

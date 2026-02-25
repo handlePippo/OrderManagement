@@ -74,7 +74,7 @@ namespace OrderManagement.Order.Api.Application.Services
                 return Array.Empty<OrderDto>()!;
             }
 
-            foreach(var order in orders)
+            foreach (var order in orders)
             {
                 var targetOrderItems = orderItems
                     .Where(i => i.OrderId == order.Id)

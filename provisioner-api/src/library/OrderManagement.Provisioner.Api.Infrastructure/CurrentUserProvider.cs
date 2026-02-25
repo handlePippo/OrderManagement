@@ -13,10 +13,9 @@ public sealed class CurrentUserProvider : ICurrentUserProvider
         _http = http;
     }
 
-    public bool IsAdmin => _http?.HttpContext?.User?.IsAdmin() ?? throw new InvalidOperationException("Invalid or missing User in HttpContext.");
+    public bool IsAdmin => _http?.HttpContext?.User?.IsAdmin() 
+        ?? throw new InvalidOperationException("Invalid or missing User in HttpContext.");
 
     public int GetLoggedUserId() => _http?.HttpContext?.User?.GetLoggedUserId()
-        ?? throw new InvalidOperationException("Invalid or missing User in HttpContext.");
-    public string GetLoggedUsername() => _http?.HttpContext?.User?.GetLoggedUsername()
         ?? throw new InvalidOperationException("Invalid or missing User in HttpContext.");
 }

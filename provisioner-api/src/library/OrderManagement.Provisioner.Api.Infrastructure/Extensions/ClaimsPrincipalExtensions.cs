@@ -41,25 +41,5 @@ namespace OrderManagement.Provisioner.Api.Persistence.Extensions
 
             return id;
         }
-
-        /// <summary>
-        /// Gets the user id.
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        /// <exception cref="UnauthorizedAccessException"></exception>
-        public static string GetLoggedUsername(this ClaimsPrincipal user)
-        {
-            ArgumentNullException.ThrowIfNull(user);
-
-            var username = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                throw new UnauthorizedAccessException("Invalid username claim");
-            }
-
-            return username;
-        }
     }
 }

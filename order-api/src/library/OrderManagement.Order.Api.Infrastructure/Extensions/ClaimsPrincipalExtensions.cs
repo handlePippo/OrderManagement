@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using OrderManagement.Order.Api.Application.Configuration;
+using System.Security.Claims;
 
 namespace OrderManagement.Order.Api.Persistence.Extensions
 {
@@ -19,7 +20,7 @@ namespace OrderManagement.Order.Api.Persistence.Extensions
 
             var userId = user.FindFirst(ClaimTypes.Role)?.Value;
 
-            return userId == "Admin";
+            return userId == UserRoles.Admin;
         }
 
         /// <summary>

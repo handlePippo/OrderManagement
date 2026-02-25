@@ -1,5 +1,4 @@
-﻿using OrderManagement.Provisioner.Api.Application.DTOs.Token;
-using OrderManagement.Provisioner.Api.Application.DTOs.Users;
+﻿using OrderManagement.Provisioner.Api.Application.DTOs.Users;
 
 namespace OrderManagement.Provisioner.Api.Application.Interfaces
 {
@@ -9,7 +8,6 @@ namespace OrderManagement.Provisioner.Api.Application.Interfaces
     public interface IUserService
     {
         Task<IReadOnlyList<UserDto>> ListAsync(CancellationToken cancellationToken = default);
-        Task<UserDto?> GetAsync(TokenRequestDto request, CancellationToken cancellationToken = default);
         Task<UserDto?> GetAsync(int id, CancellationToken cancellationToken = default);
         Task<bool> ExistsAsync(int id, CancellationToken cancellationToken = default);
         Task CreateAsync(CreateUserDto entity, CancellationToken cancellationToken = default);

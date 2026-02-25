@@ -4,7 +4,7 @@ namespace OrderManagement.Order.Api.Application.DTOs.Orders;
 
 public sealed record CreateOrderDto
 {
-    [Required]  
+    [Required]
     public required int AddressId { get; init; }
 
     [Required]

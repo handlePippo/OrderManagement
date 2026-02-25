@@ -18,6 +18,7 @@ namespace OrderManagement.Order.Api
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             builder.Services.AddHttpContextAccessor();
 

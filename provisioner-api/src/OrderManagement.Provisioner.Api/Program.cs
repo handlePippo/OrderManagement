@@ -17,6 +17,7 @@ namespace OrderManagement.Provisioner.Api
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             builder.Services.AddHttpContextAccessor();
 
@@ -33,7 +34,6 @@ namespace OrderManagement.Provisioner.Api
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
