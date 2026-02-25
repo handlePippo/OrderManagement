@@ -34,13 +34,24 @@ public sealed class AddressRepository : IAddressRepository
 
     public async Task<IReadOnlyList<Address>> ListAsync(CancellationToken cancellationToken = default)
     {
-        var dbEntities = await DbContext
-                                .Addresses
-                                .Where(a => a.UserId == CurrentUserId)
-                                .AsNoTracking()
-                                .ToListAsync(cancellationToken);
+        IReadOnlyList<AddressEntity> entities;
+        if (_currentUserProvider.IsAdmin)
+        {
+            entities = await DbContext
+                                      .Addresses
+                                       .AsNoTracking()
+                                       .ToListAsync(cancellationToken);
+        }
+        else
+        {
+            entities = await DbContext
+                                      .Addresses
+                                      .AsNoTracking()
+                                      .Where(a => a.UserId == CurrentUserId)
+                                      .ToListAsync(cancellationToken);
+        }
 
-        return _mapper.Map<IReadOnlyList<Address>>(dbEntities);
+        return _mapper.Map<IReadOnlyList<Address>>(entities);
     }
 
     public Task<bool> ExistsAsync(int id, CancellationToken ct = default)

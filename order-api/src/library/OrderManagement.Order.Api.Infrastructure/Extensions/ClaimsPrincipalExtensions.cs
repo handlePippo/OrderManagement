@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using OrderManagement.Order.Api.Application.Configuration;
+using System.Security.Claims;
 
 namespace OrderManagement.Order.Api.Persistence.Extensions
 {
@@ -7,6 +8,21 @@ namespace OrderManagement.Order.Api.Persistence.Extensions
     /// </summary>
     public static class ClaimsPrincipalExtensions
     {
+        /// <summary>
+        /// Gets the user id.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizedAccessException"></exception>
+        public static bool IsAdmin(this ClaimsPrincipal user)
+        {
+            ArgumentNullException.ThrowIfNull(user);
+
+            var userId = user.FindFirst(ClaimTypes.Role)?.Value;
+
+            return userId == UserRoles.Admin;
+        }
+
         /// <summary>
         /// Gets the user id.
         /// </summary>
@@ -25,26 +41,6 @@ namespace OrderManagement.Order.Api.Persistence.Extensions
             }
 
             return id;
-        }
-
-        /// <summary>
-        /// Gets the user id.
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        /// <exception cref="UnauthorizedAccessException"></exception>
-        public static string GetLoggedUsername(this ClaimsPrincipal user)
-        {
-            ArgumentNullException.ThrowIfNull(user);
-
-            var username = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                throw new UnauthorizedAccessException("Invalid username claim");
-            }
-
-            return username;
         }
     }
 }

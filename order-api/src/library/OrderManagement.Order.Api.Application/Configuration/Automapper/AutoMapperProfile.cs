@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using OrderManagement.Order.Api.Application.DTOs.Orders;
-using OrderManagement.Order.Api.Application.DTOs.Orders.Create;
-using OrderManagement.Order.Api.Application.DTOs.Orders.Update;
+using OrderManagement.Order.Api.Domain.Entities;
 
 namespace OrderManagement.Order.Api.Application.Configuration.Automapper
 {
@@ -10,74 +9,34 @@ namespace OrderManagement.Order.Api.Application.Configuration.Automapper
         public AutoMapperProfile()
         {
             ConfigureOrderMapping();
-            ConfigureCreateOrderMapping();
-            ConfigureUpdateOrderMapping();
         }
 
         private void ConfigureOrderMapping()
         {
+            // DTO -> Domain
+            CreateMap<OrderItemInDto, OrderItem>()
+                .ForMember(d => d.ProductId, opt => opt.MapFrom(s => s.ProductInfo.ProductId))
+                .ForMember(d => d.Quantity, opt => opt.MapFrom(s => s.ProductInfo.Quantity))
+                .ForMember(d => d.ProductName, opt => opt.Ignore())
+                .ForMember(d => d.UnitPrice, opt => opt.Ignore())
+                .ForMember(d => d.OrderId, opt => opt.Ignore())
+                .ForMember(m => m.CreatedAt, opt => opt.Ignore())
+                .ForMember(m => m.ModifiedAt, opt => opt.Ignore());
+
+            // Domain -> DTO
+            CreateMap<OrderItem, OrderItemInDto>()
+                .ConstructUsing(s => new OrderItemInDto(s.Id, s.OrderId))
+                .ForMember(d => d.ProductInfo, opt => opt.MapFrom(s => new OrderItemProductInfoDto
+                {
+                    ProductId = s.ProductId,
+                    Quantity = s.Quantity
+                }));
+
+            CreateMap<OrderItem, OrderItemOutDto>();
+
+            // Both
             CreateMap<OrderDto, Domain.Entities.Order>().ReverseMap();
-            CreateMap<OrderItemDto, Domain.Entities.OrderItem>().ReverseMap();
-            CreateMap<DTOs.Orders.OrderItemProductInfoDto, Domain.ValueObjects.OrderItemProductInfo>().ReverseMap();
-            CreateMap<ShippingAddressDto, Domain.ValueObjects.ShippingAddress>().ReverseMap();
-        }
-
-        private void ConfigureCreateOrderMapping()
-        {
-            CreateMap<CreateOrderDto, Domain.Entities.Order>()
-                .ForMember(m => m.Id, opt => opt.Ignore())
-                .ForMember(m => m.UserId, opt => opt.Ignore())
-                .ForMember(m => m.Status, opt => opt.Ignore())
-                .ForMember(m => m.Total, opt => opt.Ignore())
-                .ForMember(m => m.Subtotal, opt => opt.Ignore())
-                .ForMember(m => m.CreatedAt, opt => opt.Ignore())
-                .ForMember(m => m.ModifiedAt, opt => opt.Ignore());
-
-            CreateMap<OrderItemDto, Domain.Entities.OrderItem>()
-                .ForMember(m => m.Id, opt => opt.Ignore())
-                .ForMember(m => m.OrderId, opt => opt.Ignore())
-                .ForMember(m => m.CreatedAt, opt => opt.Ignore())
-                .ForMember(m => m.ModifiedAt, opt => opt.Ignore());
-
-            CreateMap<CreateShippingAddressDto, Domain.ValueObjects.ShippingAddress>();
-        }
-
-        private void ConfigureUpdateOrderMapping()
-        {
-            CreateMap<UpdateOrderDto, Domain.Entities.Order>()
-                .ForMember(m => m.Id, opt => opt.Ignore())
-                .ForMember(m => m.UserId, opt => opt.Ignore())
-                .ForMember(m => m.Status, opt => opt.Ignore())
-                .ForMember(m => m.Total, opt => opt.Ignore())
-                .ForMember(m => m.Subtotal, opt => opt.Ignore())
-                .ForMember(m => m.CreatedAt, opt => opt.Ignore())
-                .ForMember(m => m.ModifiedAt, opt => opt.Ignore())
-                .ForAllMembers(opt => opt.Condition((_, _, srcMember) => GetOnlyValorizedProperty(srcMember)));
-
-            CreateMap<OrderItemDto, Domain.Entities.OrderItem>()
-                .ForMember(m => m.Id, opt => opt.Ignore())
-                .ForMember(m => m.OrderId, opt => opt.Ignore())
-                .ForMember(m => m.CreatedAt, opt => opt.Ignore())
-                .ForMember(m => m.ModifiedAt, opt => opt.Ignore())
-                .ForAllMembers(opt => opt.Condition((_, _, srcMember) => GetOnlyValorizedProperty(srcMember)));
-
-            CreateMap<UpdateShippingAddressDto, Domain.ValueObjects.ShippingAddress>()
-                .ForAllMembers(opt => opt.Condition((_, _, srcMember) => GetOnlyValorizedProperty(srcMember)));
-        }
-
-        private static bool GetOnlyValorizedProperty(object value)
-        {
-            if (value == null)
-            {
-                return false;
-            }
-
-            if (value is not string str)
-            {
-                return true;
-            }
-
-            return !string.IsNullOrWhiteSpace(str);
+            CreateMap<ShippingAddressDto, ShippingAddress>().ReverseMap();
         }
     }
 }

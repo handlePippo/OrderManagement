@@ -8,11 +8,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OrderManagement.Provisioner.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/users")]
     [Produces("application/json")]
     [Consumes("application/json")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : ControllerBase
     {
         private readonly IUserService _service;
@@ -21,9 +21,7 @@ namespace OrderManagement.Provisioner.Api.Controllers
             _service = service;
         }
 
-
         [HttpGet("list")]
-        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

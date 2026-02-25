@@ -6,11 +6,6 @@ namespace OrderManagement.Order.Api.Persistence.Entities;
 public abstract class EntityBase
 {
     /// <summary>
-    /// Entity id.
-    /// </summary>
-    public int Id { get; private set; }
-
-    /// <summary>
     /// Created at metadata.
     /// </summary>
     public DateTime CreatedAt { get; private set; }
@@ -19,18 +14,4 @@ public abstract class EntityBase
     /// Modified at metadata.
     /// </summary>
     public DateTime? ModifiedAt { get; private set; }
-
-    /// <summary>
-    /// Constructor for Automapper.
-    /// </summary>
-    protected EntityBase() { }
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="id"></param>
-    protected EntityBase(int id)
-    {
-        Id = id;
-    }
 }

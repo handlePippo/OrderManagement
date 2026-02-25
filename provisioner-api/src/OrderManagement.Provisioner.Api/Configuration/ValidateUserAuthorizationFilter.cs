@@ -28,7 +28,7 @@ namespace OrderManagement.Provisioner.Api.Configuration
 
             var user = await _userRepository.GetAsync(id, context.HttpContext.RequestAborted);
 
-            if (user is null || user.Id != _currentUserProvider.GetLoggedUserId())
+            if (user is null || (user.Id != _currentUserProvider.GetLoggedUserId() && !_currentUserProvider.IsAdmin))
             {
                 context.Result = new ForbidResult();
                 return;

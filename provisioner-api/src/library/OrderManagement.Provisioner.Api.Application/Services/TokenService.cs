@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OrderManagement.Provisioner.Api.Application.DTOs.Token;
 using OrderManagement.Provisioner.Api.Application.Interfaces;
+using OrderManagement.Provisioner.Api.Application.Repositories;
+using OrderManagement.Provisioner.Api.Domain.ValueObjects;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -18,17 +21,21 @@ namespace OrderManagement.Provisioner.Api.Application.Services
         private string JwtIssuer => _configuration[_jwtIssuer]!;
 
         private readonly IConfiguration _configuration;
-        private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public TokenService(IConfiguration configuration, IUserService userService)
+        public TokenService(IConfiguration configuration, IUserRepository userRepository, IMapper mapper)
         {
             _configuration = configuration;
-            _userService = userService;
+            _userRepository = userRepository;
+            _mapper = mapper;
         }
 
-        public async Task<TokenResponseDto> GetTokenAsync(TokenRequestDto loginRequest, CancellationToken cancellationToken)
+        public async Task<TokenResponseDto> GetTokenAsync(TokenRequestDto loginRequestDto, CancellationToken cancellationToken)
         {
-            var user = await _userService.GetAsync(loginRequest, cancellationToken)
+            var loginRequest = _mapper.Map<TokenRequest>(loginRequestDto);
+
+            var user = await _userRepository.GetAsync(loginRequest, cancellationToken)
                 ?? throw new InvalidOperationException("Invalid credentials.");
 
             var keyBytes = Convert.FromHexString(JwtKey);

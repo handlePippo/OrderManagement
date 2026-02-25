@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfile>());
 
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderItemRepository, OrderItemRepository>();
         services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }

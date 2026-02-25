@@ -8,6 +8,11 @@ namespace OrderManagement.Order.Api.Domain.Entities;
 public sealed class Order : EntityBase
 {
     /// <summary>
+    /// Id of the order.
+    /// </summary>
+    public Guid Id { get; private set; }
+
+    /// <summary>
     /// Id of the user that requests the order.
     /// </summary>
     public int UserId { get; private set; }
@@ -49,12 +54,18 @@ public sealed class Order : EntityBase
     /// <param name="userId"></param>
     /// <param name="status"></param>
     /// <exception cref="ArgumentException"></exception>
-    public Order(int id, int userId, OrderStatus status)
-        : base(id)
+    public Order(Guid id, int userId, OrderStatus status)
     {
+        Id = id;
         UserId = userId;
         Status = status;
     }
+
+    /// <summary>
+    /// Sets id.
+    /// </summary>
+    /// <param name="id"></param>
+    public void SetId(Guid id) => Id = id;
 
     /// <summary>
     /// Sets user id.

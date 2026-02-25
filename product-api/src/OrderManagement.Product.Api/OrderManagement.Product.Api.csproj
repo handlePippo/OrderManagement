@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.24" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -18,6 +17,10 @@
   <ItemGroup>
     <ProjectReference Include="..\library\OrderManagement.Product.Api.Application\OrderManagement.Product.Api.Application.csproj" />
     <ProjectReference Include="..\library\OrderManagement.Product.Api.Infrastructure\OrderManagement.Product.Api.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

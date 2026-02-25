@@ -1,3 +1,4 @@
+using OrderManagement.Order.Api.Domain.Entities;
 using OrderManagement.Order.Api.Domain.ValueObjects;
 
 namespace OrderManagement.Order.Api.Persistence.Entities;
@@ -7,6 +8,11 @@ namespace OrderManagement.Order.Api.Persistence.Entities;
 /// </summary>
 public sealed class OrderEntity : EntityBase
 {
+    /// <summary>
+    /// Entity id.
+    /// </summary>
+    public Guid Id { get; private set; }
+
     /// <summary>
     /// Id of the user that requests the order.
     /// </summary>
@@ -36,22 +42,4 @@ public sealed class OrderEntity : EntityBase
     /// Constructor for EF / Automapper.
     /// </summary>
     private OrderEntity() { }
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="userId"></param>
-    /// <param name="shippingAddress"></param>
-    /// <param name="items"></param>
-    /// <exception cref="ArgumentException"></exception>
-    public OrderEntity(int id, int userId, OrderStatus status, decimal subtotal, decimal total, ShippingAddress shippingAddress)
-        : base(id)
-    {
-        UserId = userId;
-        Status = status;
-        Subtotal = subtotal;
-        Total = total;
-        ShippingAddress = shippingAddress ?? throw new ArgumentNullException(nameof(shippingAddress));
-    }
 }

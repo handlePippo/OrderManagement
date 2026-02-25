@@ -21,18 +21,21 @@ namespace OrderManagement.Category.Api
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
+            if (args.Contains("--migrate-only"))
             {
-                var db = scope.ServiceProvider.GetRequiredService<CategoryDbContext>();
-                db.Database.Migrate();
+                using (var scope = app.Services.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<CategoryDbContext>();
+                    db.Database.Migrate();
+                }
+
+                return;
             }
 
             app.ConfigureMiddlewares();
 
             app.UseSwagger();
             app.UseSwaggerUI();
-
-            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

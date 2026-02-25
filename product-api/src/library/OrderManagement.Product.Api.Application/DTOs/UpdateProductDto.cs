@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace OrderManagement.Product.Api.Application.DTOs;
 
 public sealed record UpdateProductDto

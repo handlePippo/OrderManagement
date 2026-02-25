@@ -2,18 +2,21 @@
 
 namespace OrderManagement.Order.Api.Application.DTOs.Orders
 {
-    public sealed record OrderDto : EntityBaseDto
+    public sealed record OrderDto
     {
+        public Guid Id { get; set; }
         public int UserId { get; init; }
         public OrderStatus Status { get; init; }
         public decimal Subtotal { get; init; }
         public decimal Total { get; init; }
         public ShippingAddressDto ShippingAddress { get; init; } = null!;
-        public IReadOnlyList<OrderItemDto> Items { get; init; } = Array.Empty<OrderItemDto>()!;
+        public IReadOnlyList<OrderItemOutDto> Items { get; init; } = Array.Empty<OrderItemOutDto>()!;
+        public DateTime CreatedAt { get; private set; }
+        public DateTime? ModifiedAt { get; private set; }
 
-        public OrderDto(int id, int userId) : base(id)
+        public OrderDto(Guid id, int userId)
         {
-            Status = OrderStatus.Pending;
+            Id = id;
             UserId = userId;
         }
     }

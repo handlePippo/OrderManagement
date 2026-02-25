@@ -8,11 +8,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OrderManagement.Provisioner.Api.Controllers
 {
+    [Authorize]
     [ApiController]
-    [Route("api/address")]
-    [Produces("application/json")]
-    [Consumes("application/json")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("api/addresses")]
     public class AddressController : ControllerBase
     {
         private readonly IAddressService _service;
