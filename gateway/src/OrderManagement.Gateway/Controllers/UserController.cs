@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrderManagement.Gateway.Application.DTOs.Products;
 using OrderManagement.Gateway.Application.DTOs.Provisioners.Users;
 using OrderManagement.Gateway.Application.Interfaces.Provisioner;
 using System.ComponentModel.DataAnnotations;
@@ -28,12 +29,7 @@ namespace OrderManagement.Gateway.Controllers
         {
             var dto = await _client.ListAsync(token);
 
-            if (dto is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(dto);
+            return Ok(dto ?? Array.Empty<UserDto>()!);
         }
 
         [HttpGet("{id:int}")]

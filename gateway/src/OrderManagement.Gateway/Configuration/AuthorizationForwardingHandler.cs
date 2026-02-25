@@ -2,7 +2,7 @@
 
 namespace OrderManagement.Gateway.Configuration
 {
-    public sealed class AuthorizationForwardingHandler : DelegatingHandler
+    public class AuthorizationForwardingHandler : DelegatingHandler
     {
         private readonly ICurrentUserProvider _currentUserProvider;
 

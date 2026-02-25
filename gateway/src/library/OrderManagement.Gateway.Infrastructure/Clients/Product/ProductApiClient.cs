@@ -62,7 +62,7 @@ public sealed class ProductApiClient : IProductApiClient
 
     public async Task<IReadOnlyList<ProductDto>> GetRangeAsync(GetProductRangeDto dto, CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync("api/products/range", cancellationToken);
+        var response = await _httpClient.PostAsJsonAsync("api/products/range", dto, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {

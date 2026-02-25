@@ -49,7 +49,7 @@ The solution consists of:
 - ✔ Snapshot-based order model (product and shipping data preserved over time)  
 - ✔ JWT authentication  
 - ✔ Docker-based local orchestration  
-- ✔ Database-level referential integrity across services  
+- ✔ Database-level referential integrity across services
 
 ---
 
@@ -231,3 +231,17 @@ The entire system is designed to run through Docker Compose, providing:
 - deterministic local environments
 - simplified onboarding
 - infrastructure reproducibility
+
+---
+
+## ⚠️ Limitations / Trade-offs
+
+This project intentionally focuses on clarity and microservice isolation rather than production-grade completeness.
+
+- **No distributed transactions**: each service guarantees consistency only within its own boundary. Cross-service operations rely on synchronous HTTP calls and local transactions.
+- **Shared database instance**: all services use the same MySQL instance for simplicity. This is a pragmatic choice for the exercise; in a production scenario each service would typically own its own database to maximize autonomy.
+- **Database-level relationships across services**: foreign keys are enforced at DB level via init scripts to guarantee referential integrity while keeping services decoupled at code level. This introduces operational coupling to the shared schema.
+- **Simplified authorization model**: role assignment (Admin/User) is intentionally minimal and designed for demo purposes, not a complete IAM solution.
+- **No async messaging / eventual consistency**: the system uses synchronous REST calls only; no event-driven patterns (Kafka/RabbitMQ) or outbox/inbox mechanisms are implemented.
+- **Observability is minimal**: no distributed tracing/centralized logging/metrics stack (OpenTelemetry, Prometheus, etc.) is included.
+- **Health checks are basic**: the solution relies on Docker health checks; richer `/health` endpoints could be added per service.
