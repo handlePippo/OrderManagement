@@ -16,4 +16,8 @@
     <ProjectReference Include="..\library\OrderManagement.Gateway.Infrastructure\OrderManagement.Gateway.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+	
 </Project>

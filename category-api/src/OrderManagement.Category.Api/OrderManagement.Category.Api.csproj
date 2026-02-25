@@ -19,4 +19,8 @@
     <ProjectReference Include="..\library\OrderManagement.Category.Api.Infrastructure\OrderManagement.Category.Api.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+	
 </Project>

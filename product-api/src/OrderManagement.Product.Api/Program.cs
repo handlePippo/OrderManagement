@@ -21,10 +21,15 @@ namespace OrderManagement.Product.Api
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
+            if (args.Contains("--migrate-only"))
             {
-                var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
-                db.Database.Migrate();
+                using (var scope = app.Services.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
+                    db.Database.Migrate();
+                }
+
+                return;
             }
 
             app.ConfigureMiddlewares();
@@ -32,6 +37,7 @@ namespace OrderManagement.Product.Api
             app.UseSwagger();
             app.UseSwaggerUI();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

@@ -10,12 +10,10 @@ namespace OrderManagement.Provisioner.Api.Persistence.Configuration;
 
 public static class DependencyInjection
 {
-    private const string ProvisioningName = "MySql";
-
     public static void AddProvisionerPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString(ProvisioningName)
-            ?? throw new InvalidOperationException($"Connection string '{ProvisioningName}' not found.");
+        var connectionString = configuration.GetConnectionString("MySql")
+            ?? throw new InvalidOperationException("Connection string 'MySql' not found");
 
         services.AddDbContext<UserDbContext>(options =>
         {
