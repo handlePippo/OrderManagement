@@ -146,6 +146,19 @@ services:
       - ./db/init:/init:ro
     entrypoint: ["/bin/sh", "/init/db-init.sh"]
 
+  # stack-ready
+  stack-ready:
+    image: alpine
+    depends_on:
+      gateway:
+        condition: service_started
+    command: >
+      sh -c "echo '';
+            echo '🚀 PhotoSì Order Management successfully started';
+            echo '📚 Swagger Gateway → http://localhost:5000/swagger';
+            echo '';
+            sleep 2"
+
 # volumes
 volumes:
   mysql_data:

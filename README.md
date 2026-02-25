@@ -2,139 +2,232 @@
 
 # 📦 Order Management Microservices (.NET)
 
-Minimal order management system built with .NET microservices architecture, designed to demonstrate service isolation, inter-service communication, and real-world ordering workflows.
+Minimal order management system built with a **microservices architecture in .NET**, designed for PhotoSì.
 
-The system manages:
+The system supports:
 
-👤 Users and address book
+- User authentication and address book
+- Product categories and catalog
+- Order creation and management
+- API Gateway as single entry point
 
-🗂 Product categories
-
-📦 Products
-
-🧾 Orders and order items
-
-🌐 API Gateway for unified access
-
-Each domain is implemented as an independent microservice with its own DbContext and persistence boundary while sharing the same MySQL database. Cross-service relationships are enforced at the database level to maintain referential integrity without coupling services at code level.
+Each domain is implemented as an **independent microservice** with its own DbContext and persistence boundary.  
+Database relationships are enforced at the MySQL level while keeping services isolated at code level.
 
 ---
 
-## Tecnologie utilizzate
+## 🧰 Tech stack
 
-* .NET 8
-* ASP.NET Core Web API
-* xUnit
-* NSubstitute
-* AutoFixture
-* FluentAssertions
+- **Language:** C# (.NET 8)
+- **API:** ASP.NET Core Web API (REST)
+- **Persistence:** Entity Framework Core
+- **Database:** MySQL 8
+- **Authentication:** JWT Bearer
+- **API Documentation:** Swagger / OpenAPI
+- **Containerization & Orchestration:** Docker + Docker Compose
+- **Testing:** xUnit (unit tests)
 
----
-
-## Struttura del progetto
-
-* **Domain**: entità e value objects
-* **Application**: servizi, DTO e logica applicativa
-* **Infrastructure**: repository e accesso ai dati (JSON)
-* **Api**: controller, middleware e configurazione
-* **Tests**: test unitari
+> Note: each microservice owns its own DbContext and persistence layer, even though all services share the same MySQL instance.
 
 ---
 
-## Come avviare l'applicazione
+## 🏗 Architecture
+
+The solution consists of:
+
+- **Provisioner API** — users, authentication and addresses  
+- **Category API** — product categories  
+- **Product API** — product catalog  
+- **Order API** — order lifecycle and order item snapshotting  
+- **Gateway API** — unified REST entry point  
+
+### Key characteristics
+
+- ✔ Service isolation (no project references between services)  
+- ✔ Entity Framework Core per service  
+- ✔ HTTP communication between services  
+- ✔ Snapshot-based order model (product and shipping data preserved over time)  
+- ✔ JWT authentication  
+- ✔ Docker-based local orchestration  
+- ✔ Database-level referential integrity across services  
+
+---
+
+## 🔐 Authentication & Authorization
+
+- JWT authentication handled by **Provisioner API**
+- Public read access for catalog endpoints
+- Protected write operations
+- Role-based authorization support (Admin role for privileged operations)
+
+---
+
+## 🐳 Running the project
+
+### Requirements
+
+- Docker
+- Docker Compose
+
+### Start the system
 
 ```bash
-dotnet restore
-dotnet run --project PhotoSi.Questionnaire.Api
+docker compose up --build
 ```
 
-Swagger sarà disponibile all'avvio, ad esempio:
+The system will automatically:
 
-```
-http://localhost:<port>/swagger
-```
+- Start MySQL
+- Apply EF migrations
+- Create database constraints
+- Seed demo data
+- Start all microservices
+- Start the API Gateway
 
 ---
 
-## Avvio con Docker
+## 🌐 Service endpoints
 
-Costruire l’immagine dalla root folder del progetto:
-
-```bash
-docker build -t photosi-questionnaire-api .
-```
-
-Avviare il container:
-
-```bash
-docker run --rm -p 8080:8080 photosi-questionnaire-api
-```
-
-L’applicazione sarà disponibile su:
-
-```
-http://localhost:8080/swagger
-```
-
-## Esempi di chiamata API
-
-Recuperare tutte le domande:
-
-```bash
-curl http://localhost:8080/api/questionnaire
-```
-
-Recuperare una domanda per id:
-
-```bash
-curl http://localhost:8080/api/questionnaire/1
-```
-
-Ricercare nelle domande:
-
-```bash
-curl http://localhost:8080/api/questionnaire/search?term=dotnet
-```
-
+| Service     | URL                                                            |
+| ----------- | -------------------------------------------------------------- |
+| Gateway     | [http://localhost:5000/swagger](http://localhost:5000/swagger) |
+| Provisioner | [http://localhost:5001/swagger](http://localhost:5001/swagger) |
+| Category    | [http://localhost:5002/swagger](http://localhost:5002/swagger) |
+| Product     | [http://localhost:5003/swagger](http://localhost:5003/swagger) |
+| Order       | [http://localhost:5004/swagger](http://localhost:5004/swagger) |
 
 ---
 
-## Endpoint principali
+## 👤 Demo credentials
 
-| Metodo | Endpoint                        | Descrizione                    |
-| ------ | ------------------------------- | ------------------------------ |
-| GET    | /api/questionnaire              | Restituisce tutte le domande   |
-| GET    | /api/questionnaire/{id}         | Restituisce una domanda per id |
-| GET    | /api/questionnaire/search?term= | Ricerca nelle domande          |
+* Admin
+email: admin@demo.it
+password: admin
 
----
-
-## Eseguire i test
-
-```bash
-dotnet test
-```
+* User
+email: user@demo.it
+password: user
 
 ---
 
-## Scelte progettuali
+## 🧾 How to make an Order
 
-* Architettura a layer per separare le responsabilità
-* Repository JSON per semplicità e isolamento dell'infrastruttura
-* Middleware globale per la gestione delle eccezioni
-* Test unitari su repositor, service, factory e controller
+- Authenticate and obtain JWT
+- Browse categories
+- Browser products of the choosen category
+- Create an order with selected items and shipping details
+- Update order while status is pending
+- Retrieve order details
+- Orders store snapshots of product information and shipping data to guarantee historical consistency even if catalog data changes.
 
 ---
 
-## Note
+## 🎯 Project goals
 
-Il progetto è stato sviluppato come esercizio tecnico per dimostrarvi:
+This project demonstrates:
 
-* organizzazione del codice
-* testabilità
-* gestione degli errori in una Web API .NET
-* che so rendere informale la formalità di un questionario 😀
+- Microservice boundaries and independence
+- Cross-service database integrity
+- Realistic order lifecycle handling
+- Transaction consistency within a service
+- Clean domain modeling
+- Containerized development workflow
 
-## Autore
+---
 
-- Filippo Palliani
+## ⚙️ Technical decisions
+
+### Microservice isolation
+
+Each domain is implemented as an independent microservice with:
+
+- its own DbContext
+- no direct project references to other services
+- communication exclusively through HTTP
+
+This ensures loose coupling and allows services to evolve independently.
+
+---
+
+### Shared database with bounded contexts
+
+Although all services use the same MySQL instance, each microservice owns its schema and persistence logic.
+
+Cross-service relationships are enforced at the database level using foreign keys defined via initialization scripts.  
+This approach guarantees referential integrity while preserving application-level isolation.
+
+---
+
+### Snapshot-based order model
+
+Orders store a snapshot of:
+
+- product name
+- product price
+- shipping address
+
+This prevents historical inconsistencies when catalog data changes after an order has been created.
+
+The Order service does not rely on real-time product data when retrieving historical orders.
+
+---
+
+### HTTP-based inter-service communication
+
+Services communicate using HTTP clients instead of direct dependencies.
+
+This reflects real-world distributed architectures and enables:
+
+- independent deployment
+- resilience strategies
+- easier scaling
+
+---
+
+### API Gateway as single entry point
+
+The Gateway aggregates all services and provides:
+
+- centralized routing
+- authentication propagation
+- simplified client interaction
+
+Clients never invoke microservices directly.
+
+---
+
+### JWT authentication and propagation
+
+Authentication is handled by the Gateway service (JWT validation)
+
+The Gateway forwards the Authorization header to downstream services, allowing each service to validate tokens independently without tight coupling.
+
+---
+
+### Database initialization strategy
+
+The system uses:
+
+- EF Core migrations for schema creation
+- a dedicated initialization container for foreign keys and seed data
+
+This guarantees reproducible environments and consistent startup behavior.
+
+---
+
+### Transaction boundaries
+
+Each service maintains transactional consistency within its own boundary.
+
+Distributed transactions are intentionally avoided.  
+The Order service ensures internal consistency while relying on external services only during command execution.
+
+---
+
+### Docker-first development
+
+The entire system is designed to run through Docker Compose, providing:
+
+- deterministic local environments
+- simplified onboarding
+- infrastructure reproducibility
