@@ -81,6 +81,7 @@ namespace OrderManagement.Order.Api.Configuration
                     c.BaseAddress = new Uri(configuration["ProductApi:BaseUrl"]!);
                     c.Timeout = TimeSpan.FromSeconds(10);
                 })
+                .AddHttpMessageHandler<JwtForwardingHandler>()
                 .AddStandardResilienceHandler();
 
             // provisioner-api
