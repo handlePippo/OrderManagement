@@ -12,75 +12,119 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      test: ["CMD-SHELL", "mysqladmin --protocol=TCP -h 127.0.0.1 -P 3306 -uroot -proot ping"]
       interval: 5s
       timeout: 3s
-      retries: 20
+      retries: 30
+      start_period: 20s
 
+  # provisioner-api
   provisioner-api:
     build: ./provisioner-api
     container_name: provisioner-api
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__MySql: server=mysql;port=3306;database=photosi;user=root;password=root
-      Jwt__Issuer: photosi
-      Jwt__Key: 09dbfbc3b7ddd8f2f26d1a5e66f1c51af0617d986ffd5b60206b400252a087b1
+      ASPNETCORE_ENVIRONMENT: Docker
     ports:
       - 5001:8080
+    depends_on:
+      provisioner-migrator:
+        condition: service_completed_successfully
+
+  provisioner-migrator:
+    build: ./provisioner-api
+    command: ["dotnet", "OrderManagement.Provisioner.Api.dll", "--migrate-only"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
     depends_on:
       mysql:
         condition: service_healthy
 
+  # category-api
   category-api:
     build: ./category-api
     container_name: category-api
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__MySql: server=mysql;port=3306;database=photosi;user=root;password=root
-      Jwt__Issuer: photosi
-      Jwt__Key: 09dbfbc3b7ddd8f2f26d1a5e66f1c51af0617d986ffd5b60206b400252a087b1
+      ASPNETCORE_ENVIRONMENT: Docker
     ports:
       - 5002:8080
     depends_on:
+      category-migrator:
+        condition: service_completed_successfully
+
+  category-migrator:
+    build: ./category-api
+    command: ["dotnet", "OrderManagement.Category.Api.dll", "--migrate-only"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+    depends_on:
       mysql:
         condition: service_healthy
-      provisioner-api:
-        condition: service_started
+      provisioner-migrator:
+        condition: service_completed_successfully
 
+  # product-api
   product-api:
     build: ./product-api
     container_name: product-api
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__MySql: server=mysql;port=3306;database=photosi;user=root;password=root
-      Jwt__Issuer: photosi
-      Jwt__Key: 09dbfbc3b7ddd8f2f26d1a5e66f1c51af0617d986ffd5b60206b400252a087b1
+      ASPNETCORE_ENVIRONMENT: Docker
     ports:
       - 5003:8080
     depends_on:
+      product-migrator:
+        condition: service_completed_successfully
+
+  product-migrator:
+    build: ./product-api
+    command: ["dotnet", "OrderManagement.Product.Api.dll", "--migrate-only"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+    depends_on:
       mysql:
         condition: service_healthy
-      provisioner-api:
-        condition: service_started
-      category-api:
-        condition: service_started
+      category-migrator:
+        condition: service_completed_successfully
 
+  # order-api
   order-api:
     build: ./order-api
     container_name: order-api
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__MySql: server=mysql;port=3306;database=photosi;user=root;password=root
-      Jwt__Issuer: photosi
-      Jwt__Key: 09dbfbc3b7ddd8f2f26d1a5e66f1c51af0617d986ffd5b60206b400252a087b1
+      ASPNETCORE_ENVIRONMENT: Docker
     ports:
       - 5004:8080
     depends_on:
+      order-migrator:
+        condition: service_completed_successfully
+
+  order-migrator:
+    build: ./order-api
+    command: ["dotnet", "OrderManagement.Order.Api.dll", "--migrate-only"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+    depends_on:
       mysql:
         condition: service_healthy
-      provisioner-api:
-        condition: service_started
-      product-api:
-        condition: service_started
+      product-migrator:
+        condition: service_completed_successfully
+
+# db-init
+  db-init:
+    image: mysql:8
+    container_name: db-init
+    depends_on:
+      mysql:
+        condition: service_healthy
+      order-migrator:
+        condition: service_completed_successfully
+    volumes:
+      - ./db/init:/init:ro
+    entrypoint: ["/bin/sh", "/init/db-init.sh"]
+
+# volumes
 volumes:
   mysql_data:
