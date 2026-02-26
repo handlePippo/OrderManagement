@@ -2,6 +2,7 @@
 using OrderManagement.Gateway.Application.Interfaces;
 using System.Net;
 using System.Net.Http.Json;
+using System.Threading;
 
 namespace OrderManagement.Gateway.Infrastructure.Clients.Order;
 
@@ -73,6 +74,17 @@ public sealed class OrderApiClient : IOrderApiClient
         }
     }
 
+    public async Task SubmitAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/orders/submit", id, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException($"Order API failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
+        }
+    }
+
     public async Task UpdateAsync(Guid id, UpdateOrderDto dto, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(dto);
@@ -89,6 +101,17 @@ public sealed class OrderApiClient : IOrderApiClient
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.DeleteAsync($"api/orders/{id}", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException($"Order API failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
+        }
+    }
+
+    public async Task DeleteSubmittedAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.DeleteAsync($"api/orders/submitted/{id}", cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {

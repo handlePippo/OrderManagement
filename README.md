@@ -31,6 +31,7 @@ The solution consists of:
 - ✔ Service isolation (no project references between services)  
 - ✔ Entity Framework Core per service  
 - ✔ HTTP communication between services  
+- ✔ Cache in memory to avoid multiple calls  
 - ✔ Snapshot-based order model (product and shipping data preserved over time)  
 - ✔ JWT authentication  
 - ✔ Docker-based local orchestration  
@@ -47,7 +48,7 @@ The solution consists of:
 - **Authentication:** JWT Bearer
 - **API Documentation:** Swagger / OpenAPI
 - **Containerization & Orchestration:** Docker + Docker Compose
-- **Testing:** xUnit (unit tests)
+- **Testing:** xUnit, NSubstitute, FluentAssertions, AutoFixture
 
 > Note: each microservice owns its own DbContext and persistence layer, even though all services share the same MySQL instance.
 

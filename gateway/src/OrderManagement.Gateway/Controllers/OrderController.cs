@@ -67,6 +67,17 @@ namespace OrderManagement.Gateway.Controllers
             return Created();
         }
 
+        [HttpPost("submit")]
+        [ProducesResponseType(typeof(OrderDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<OrderDto>> SubmitAsync([FromRoute] Guid id, CancellationToken token)
+        {
+            await _client.SubmitAsync(id, token);
+
+            return NoContent();
+        }
+
         [HttpPut("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -75,6 +86,17 @@ namespace OrderManagement.Gateway.Controllers
         public async Task<IActionResult> UpdateAsync([FromRoute] Guid id, [FromBody][Required] UpdateOrderDto request, CancellationToken token)
         {
             await _client.UpdateAsync(id, request, token);
+
+            return NoContent();
+        }
+
+        [HttpDelete("submitted/{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteSubmittedAsync([FromRoute] Guid id, CancellationToken token)
+        {
+            await _client.DeleteSubmittedAsync(id, token);
 
             return NoContent();
         }
