@@ -32,18 +32,6 @@ public sealed class OrderItemRepository : IOrderItemRepository
                        .AddRangeAsync(dbEntities, cancellationToken);
     }
 
-    public async Task DeleteRangeByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default)
-    {
-        var entities = await DbContext
-                                      .OrderItems
-                                      .AsNoTracking()
-                                      .Where(o => o.OrderId == orderId)
-                                      .ToListAsync(cancellationToken)
-                                      ?? throw new InvalidOperationException($"Order with id {orderId} not found.");
-
-        DbContext.RemoveRange(entities);
-    }
-
     public async Task<IReadOnlyList<OrderItem>> GetRangeByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default)
     {
         var entities = await DbContext
@@ -66,5 +54,16 @@ public sealed class OrderItemRepository : IOrderItemRepository
                               ?? throw new InvalidOperationException($"One or more orderId does not belong to any order.");
 
         return _mapper.Map<IReadOnlyList<OrderItem>>(entities);
+    }
+
+    public async Task DeleteRangeByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default)
+    {
+        var entities = await DbContext
+                                      .OrderItems
+                                      .Where(o => o.OrderId == orderId)
+                                      .ToListAsync(cancellationToken)
+                                      ?? throw new InvalidOperationException($"Order with id {orderId} not found.");
+
+        DbContext.RemoveRange(entities);
     }
 }

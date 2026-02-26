@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OrderManagement.Provisioner.Api.Application.DTOs.Addresses;
 using OrderManagement.Provisioner.Api.Application.DTOs.Users;
 using OrderManagement.Provisioner.Api.Application.Interfaces;
 using OrderManagement.Provisioner.Api.Configuration;

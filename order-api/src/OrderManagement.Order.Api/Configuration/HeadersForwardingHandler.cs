@@ -1,6 +1,6 @@
 ﻿namespace OrderManagement.Order.Api.Configuration
 {
-    public sealed class HeadersForwardingHandler : DelegatingHandler
+    public class HeadersForwardingHandler : DelegatingHandler
     {
         private const string AuthHeadeUserId = "X-User-Id";
         private const string AuthHeaderUserType = "X-User-Type";

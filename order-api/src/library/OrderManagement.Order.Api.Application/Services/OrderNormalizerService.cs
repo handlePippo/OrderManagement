@@ -1,4 +1,5 @@
-﻿using OrderManagement.Order.Api.Application.Interfaces;
+﻿using OrderManagement.Order.Api.Application.Factories;
+using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,7 +8,7 @@ namespace OrderManagement.Order.Api.Application.Services
     /// <summary>
     /// Product normalizer.
     /// </summary>
-    public sealed class OrderNormalizer : IOrderNormalizer
+    public sealed class OrderNormalizerService : IOrderNormalizerService
     {
         public IReadOnlyList<OrderItem> NormalizeOrderItems(Domain.Entities.Order order, IReadOnlyList<Product> products, Dictionary<int, int> productsToBeAdded, bool isUpdate = false)
         {
@@ -22,12 +23,7 @@ namespace OrderManagement.Order.Api.Application.Services
                     throw new ValidationException($"Product {product.Id} not found.");
                 }
 
-                var orderItem = new OrderItem(product.Id, order.Id)
-                {
-                    ProductName = product.Name,
-                    Quantity = qty,
-                    UnitPrice = product.Price
-                };
+                var orderItem = OrderItemFactory.Create(order.Id, product.Id, product.Name, product.Price, qty);
 
                 if (isUpdate)
                 {

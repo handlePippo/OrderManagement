@@ -8,7 +8,6 @@ using OrderManagement.Provisioner.Api.Application.Repositories;
 using OrderManagement.Provisioner.Api.Application.Services;
 using OrderManagement.Provisioner.Api.Domain.Entities;
 using OrderManagement.Provisioner.Api.Domain.ValueObjects;
-using Xunit;
 
 namespace OrderManagement.Provisioner.Api.Application.Tests.Services
 {

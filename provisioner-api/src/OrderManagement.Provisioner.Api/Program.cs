@@ -23,7 +23,7 @@ namespace OrderManagement.Provisioner.Api
 
             var app = builder.Build();
 
-            if(args.Contains("--migrate-only"))
+            if (args.Contains("--migrate-only"))
             {
                 using (var scope = app.Services.CreateScope())
                 {

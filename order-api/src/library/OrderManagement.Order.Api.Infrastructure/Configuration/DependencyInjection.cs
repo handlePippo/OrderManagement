@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Application.Repositories;
-using OrderManagement.Order.Api.Infrastructure;
 using OrderManagement.Order.Api.Infrastructure.Configuration.Automapper;
 using OrderManagement.Order.Api.Infrastructure.Repositories;
 

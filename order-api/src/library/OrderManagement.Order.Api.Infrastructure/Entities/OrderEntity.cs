@@ -26,7 +26,7 @@ public sealed class OrderEntity : EntityBase
     /// <summary>
     /// Order subtotal.
     /// </summary>
-    public decimal Subtotal { get; private set; }
+    public decimal SubTotal { get; private set; }
 
     /// <summary>
     /// Order total price.
@@ -39,7 +39,20 @@ public sealed class OrderEntity : EntityBase
     public ShippingAddress ShippingAddress { get; private set; } = null!;
 
     /// <summary>
-    /// Constructor for EF / Automapper.
+    /// Constructor.
     /// </summary>
-    private OrderEntity() { }
+    public OrderEntity() { }
+
+    /// <summary>
+    /// Constructor overload.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="userId"></param>
+    /// <param name="status"></param>
+    public OrderEntity(Guid id, int userId, OrderStatus status)
+    {
+        Id = id;
+        UserId = userId;
+        Status = status;
+    }
 }

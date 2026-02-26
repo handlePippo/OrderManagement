@@ -25,7 +25,7 @@ public sealed class Order : EntityBase
     /// <summary>
     /// Order subtotal.
     /// </summary>
-    public decimal Subtotal { get; private set; }
+    public decimal SubTotal { get; private set; }
 
     /// <summary>
     /// Order total price.
@@ -108,7 +108,7 @@ public sealed class Order : EntityBase
     /// <param name="total"></param>
     public void SetTotals(decimal subtotal, decimal total)
     {
-        Subtotal = subtotal;
+        SubTotal = subtotal;
         Total = total;
     }
 

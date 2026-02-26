@@ -12,6 +12,6 @@ public static class DependencyInjection
         services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfile>());
 
         services.AddTransient<IOrderService, OrderService>();
-        services.AddTransient<IOrderNormalizer, OrderNormalizer>();
+        services.AddTransient<IOrderNormalizerService, OrderNormalizerService>();
     }
 }

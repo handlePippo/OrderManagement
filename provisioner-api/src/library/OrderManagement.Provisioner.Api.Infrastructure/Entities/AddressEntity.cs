@@ -47,7 +47,7 @@ public sealed class AddressEntity : EntityBase
         string countryCode,
         string city,
         string postalCode,
-        string street) 
+        string street)
     {
         UserId = userId;
         CountryCode = countryCode;

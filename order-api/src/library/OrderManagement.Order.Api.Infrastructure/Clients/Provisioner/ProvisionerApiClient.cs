@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Domain.Entities;
-using OrderManagement.Order.Api.Infrastructure.Clients;
 using System.Net.Http.Json;
 
 namespace OrderManagement.Order.Api.Infrastructure.Clients.Provisioner;
@@ -24,13 +23,13 @@ public sealed class ProvisionerApiClient : IProvisionerApiClient
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync(ct);
-            throw new HttpRequestException($"Product API failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
+            throw new HttpRequestException($"Provisioner API failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
         }
 
-        var apiProduct = await response.Content.ReadFromJsonAsync<ApiShippingAddress>(cancellationToken: ct)
+        var apiAddress = await response.Content.ReadFromJsonAsync<ApiShippingAddress>(cancellationToken: ct)
             ?? throw new InvalidOperationException("Failed to deserialize response.");
 
-        return _mapper.Map<ShippingAddress>(apiProduct);
+        return _mapper.Map<ShippingAddress>(apiAddress);
     }
 
     public async Task<User> GetUserAsync(int id, CancellationToken ct)
@@ -40,7 +39,7 @@ public sealed class ProvisionerApiClient : IProvisionerApiClient
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync(ct);
-            throw new HttpRequestException($"Product API failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
+            throw new HttpRequestException($"Provisioner API failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
         }
 
         var apiUser = await response.Content.ReadFromJsonAsync<ApiUser>(cancellationToken: ct)

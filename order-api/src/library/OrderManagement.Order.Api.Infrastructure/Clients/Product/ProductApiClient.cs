@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Domain.ValueObjects;
-using OrderManagement.Order.Api.Infrastructure.Clients;
 using System.Net.Http.Json;
 
 namespace OrderManagement.Order.Api.Infrastructure.Clients.Product;

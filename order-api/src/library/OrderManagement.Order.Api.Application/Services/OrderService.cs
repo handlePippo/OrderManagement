@@ -17,7 +17,7 @@ namespace OrderManagement.Order.Api.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IOrderItemRepository _orderItemRepository;
-        private readonly IOrderNormalizer _normalizer;
+        private readonly IOrderNormalizerService _normalizer;
         private readonly IProductApiClient _productApiClient;
         private readonly IProvisionerApiClient _provisionerApiClient;
         private int CurrentUserId => _currentUserProvider.GetLoggedUserId();
@@ -41,7 +41,7 @@ namespace OrderManagement.Order.Api.Application.Services
             IOrderItemRepository orderItemRepository,
             IProductApiClient productApiClient,
             IProvisionerApiClient provisionerApiClient,
-            IOrderNormalizer productCalculationsNormalizer)
+            IOrderNormalizerService productCalculationsNormalizer)
         {
             _mapper = mapper;
             _orderRepository = repository;

@@ -27,7 +27,7 @@ namespace OrderManagement.Order.Api.Configuration.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError("{ex}: {message}", ex, ex.Message);
+                _logger.LogError(ex, "{message}", ex.Message);
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/problem+json";

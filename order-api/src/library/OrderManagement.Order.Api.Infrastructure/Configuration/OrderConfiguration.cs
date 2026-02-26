@@ -26,7 +26,7 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<OrderEntity>
             .HasMaxLength(30)
             .IsRequired();
 
-        b.Property(x => x.Subtotal)
+        b.Property(x => x.SubTotal)
             .HasColumnName("subtotal")
             .HasPrecision(18, 2)
             .IsRequired();

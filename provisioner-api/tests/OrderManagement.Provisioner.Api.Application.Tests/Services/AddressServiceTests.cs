@@ -1,12 +1,12 @@
 ﻿using AutoFixture;
 using AutoMapper;
-using NSubstitute;
 using FluentAssertions;
+using NSubstitute;
+using OrderManagement.Provisioner.Api.Application.DTOs.Addresses;
 using OrderManagement.Provisioner.Api.Application.Interfaces;
 using OrderManagement.Provisioner.Api.Application.Repositories;
 using OrderManagement.Provisioner.Api.Application.Services;
 using OrderManagement.Provisioner.Api.Domain.Entities;
-using OrderManagement.Provisioner.Api.Application.DTOs.Addresses;
 
 namespace OrderManagement.Provisioner.Api.Application.Tests.Services
 {

@@ -27,7 +27,6 @@ namespace OrderManagement.Gateway.Tests.Configuration
         public async Task SendAsync_WhenUserIsAdmin_ForwardsUserIdAndAdminUserType()
         {
             // Arrange
-            var token = _fixture.Create<CancellationToken>();
             var userId = _fixture.Create<int>();
 
             _currentUserProvider.GetLoggedUserId().Returns(userId);
@@ -36,7 +35,7 @@ namespace OrderManagement.Gateway.Tests.Configuration
             var request = new HttpRequestMessage(HttpMethod.Get, "https://example.test/api");
 
             // Act
-            var response = await _sut.SendAsyncPublic(request, token);
+            var response = await _sut.SendAsyncPublic(request, default);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -53,7 +52,6 @@ namespace OrderManagement.Gateway.Tests.Configuration
         public async Task SendAsync_WhenUserIsNotAdmin_ForwardsUserIdAndUserUserType()
         {
             // Arrange
-            var token = _fixture.Create<CancellationToken>();
             var userId = _fixture.Create<int>();
 
             _currentUserProvider.GetLoggedUserId().Returns(userId);
@@ -62,7 +60,7 @@ namespace OrderManagement.Gateway.Tests.Configuration
             var request = new HttpRequestMessage(HttpMethod.Get, "https://example.test/api");
 
             // Act
-            var response = await _sut.SendAsyncPublic(request, token);
+            var response = await _sut.SendAsyncPublic(request, default);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -78,7 +76,6 @@ namespace OrderManagement.Gateway.Tests.Configuration
         public async Task SendAsync_WhenHeadersAlreadyExist_ReplacesTheirValues()
         {
             // Arrange
-            var token = _fixture.Create<CancellationToken>();
             var userId = _fixture.Create<int>();
 
             _currentUserProvider.GetLoggedUserId().Returns(userId);
@@ -89,7 +86,7 @@ namespace OrderManagement.Gateway.Tests.Configuration
             request.Headers.TryAddWithoutValidation("X-User-Type", "old-type");
 
             // Act
-            await _sut.SendAsyncPublic(request, token);
+            await _sut.SendAsyncPublic(request, default);
 
             // Assert
             request.Headers.TryGetValues("X-User-Id", out var idValues).Should().BeTrue();
@@ -102,11 +99,8 @@ namespace OrderManagement.Gateway.Tests.Configuration
         [Fact]
         public async Task SendAsync_WhenRequestIsNull_ThrowsArgumentNullException()
         {
-            // Arrange
-            var token = _fixture.Create<CancellationToken>();
-
             // Act
-            var act = () => _sut.SendAsyncPublic(null!, token);
+            var act = () => _sut.SendAsyncPublic(null!, default);
 
             // Assert
             await act.Should().ThrowAsync<ArgumentNullException>();

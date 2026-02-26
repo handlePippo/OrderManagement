@@ -12,8 +12,7 @@ namespace OrderManagement.Order.Api.Configuration
         private readonly IOrderRepository _orderRepository;
         private readonly IMemoryCache _cache;
 
-        public ValidateAuthorizationFilter(
-            ICurrentUserProvider currentUserProvider,
+        public ValidateAuthorizationFilter(ICurrentUserProvider currentUserProvider,
             IOrderRepository orderRepository,
             IMemoryCache cache)
         {

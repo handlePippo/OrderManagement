@@ -26,7 +26,7 @@ namespace OrderManagement.Provisioner.Api.Configuration
         {
             if (!context.ActionArguments.TryGetValue("id", out var value) || value is not int id)
             {
-                context.Result = new BadRequestResult();
+                context.Result = new ForbidResult();
                 return;
             }
 
