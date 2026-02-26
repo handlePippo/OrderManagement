@@ -89,6 +89,30 @@ namespace OrderManagement.Gateway.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id:int}/stock/increase/{qty:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> IncreaseStockAsync([FromRoute] int id, [FromRoute] int qty, CancellationToken token)
+        {
+            await _client.IncreaseStock(id, qty, token);
+
+            return Accepted();
+        }
+
+        [HttpPut("{id:int}/stock/decrease/{qty:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DecreaseStockAsync([FromRoute] int id, [FromRoute] int qty, CancellationToken token)
+        {
+            await _client.DecreaseStock(id, qty, token);
+
+            return Accepted();
+        }
+
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

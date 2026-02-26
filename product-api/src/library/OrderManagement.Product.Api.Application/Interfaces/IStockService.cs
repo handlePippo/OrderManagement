@@ -1,4 +1,4 @@
-﻿namespace OrderManagement.Product.Api.Application.Services
+﻿namespace OrderManagement.Product.Api.Application.Interfaces
 {
     public interface IStockService
     {

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using OrderManagement.Product.Api.Application.DTOs;
 using OrderManagement.Product.Api.Application.Interfaces;
-using OrderManagement.Product.Api.Application.Services;
 using OrderManagement.Product.Api.Controllers;
 
 namespace OrderManagement.Product.Api.Tests.Controllers

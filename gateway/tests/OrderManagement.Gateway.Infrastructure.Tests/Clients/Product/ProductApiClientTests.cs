@@ -370,6 +370,102 @@ namespace OrderManagement.Gateway.Infrastructure.Tests.Clients.Product
             _handler.LastRequest.RequestUri!.ToString().Should().EndWith($"api/products/{id}");
         }
 
+        [Fact]
+        public async Task IncreaseStock_WhenSuccess_SendsPutToExpectedUrl()
+        {
+            // Arrange
+            var id = _fixture.Create<int>();
+            var qty = _fixture.Create<int>();
+
+            _handler.Responder = req =>
+            {
+                req.Method.Should().Be(HttpMethod.Put);
+                req.RequestUri!.ToString().Should().EndWith($"api/products/{id}/stock/increase/{qty}");
+                return new HttpResponseMessage(HttpStatusCode.Accepted);
+            };
+
+            // Act
+            await _sut.IncreaseStock(id, qty, default);
+
+            // Assert
+            _handler.LastRequest.Should().NotBeNull();
+            _handler.LastRequest!.Method.Should().Be(HttpMethod.Put);
+            _handler.LastRequest.RequestUri!.ToString().Should().EndWith($"api/products/{id}/stock/increase/{qty}");
+        }
+
+        [Fact]
+        public async Task IncreaseStock_WhenNonSuccess_ThrowsHttpRequestExceptionWithBody()
+        {
+            // Arrange
+            var id = _fixture.Create<int>();
+            var qty = _fixture.Create<int>();
+            var body = _fixture.Create<string>();
+
+            _handler.Responder = req => new HttpResponseMessage(HttpStatusCode.BadRequest)
+            {
+                ReasonPhrase = "Bad Request",
+                Content = new StringContent(body, Encoding.UTF8, "text/plain")
+            };
+
+            // Act
+            var act = () => _sut.IncreaseStock(id, qty, default);
+
+            // Assert
+            var ex = await Assert.ThrowsAsync<HttpRequestException>(act);
+            ex.Message.Should().Contain("Product API failed:");
+            ex.Message.Should().Contain("400");
+            ex.Message.Should().Contain("Bad Request");
+            ex.Message.Should().Contain(body);
+        }
+
+        [Fact]
+        public async Task DecreaseStock_WhenSuccess_SendsPutToExpectedUrl()
+        {
+            // Arrange
+            var id = _fixture.Create<int>();
+            var qty = _fixture.Create<int>();
+
+            _handler.Responder = req =>
+            {
+                req.Method.Should().Be(HttpMethod.Put);
+                req.RequestUri!.ToString().Should().EndWith($"api/products/{id}/stock/decrease/{qty}");
+                return new HttpResponseMessage(HttpStatusCode.Accepted);
+            };
+
+            // Act
+            await _sut.DecreaseStock(id, qty, default);
+
+            // Assert
+            _handler.LastRequest.Should().NotBeNull();
+            _handler.LastRequest!.Method.Should().Be(HttpMethod.Put);
+            _handler.LastRequest.RequestUri!.ToString().Should().EndWith($"api/products/{id}/stock/decrease/{qty}");
+        }
+
+        [Fact]
+        public async Task DecreaseStock_WhenNonSuccess_ThrowsHttpRequestExceptionWithBody()
+        {
+            // Arrange
+            var id = _fixture.Create<int>();
+            var qty = _fixture.Create<int>();
+            var body = _fixture.Create<string>();
+
+            _handler.Responder = req => new HttpResponseMessage(HttpStatusCode.NotFound)
+            {
+                ReasonPhrase = "Not Found",
+                Content = new StringContent(body, Encoding.UTF8, "text/plain")
+            };
+
+            // Act
+            var act = () => _sut.DecreaseStock(id, qty, default);
+
+            // Assert
+            var ex = await Assert.ThrowsAsync<HttpRequestException>(act);
+            ex.Message.Should().Contain("Product API failed:");
+            ex.Message.Should().Contain("404");
+            ex.Message.Should().Contain("Not Found");
+            ex.Message.Should().Contain(body);
+        }
+
         private sealed class RecordingHandler : HttpMessageHandler
         {
             public Func<HttpRequestMessage, HttpResponseMessage>? Responder { get; set; }

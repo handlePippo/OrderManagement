@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderManagement.Product.Api.Application.DTOs;
 using OrderManagement.Product.Api.Application.Interfaces;
-using OrderManagement.Product.Api.Application.Services;
 using OrderManagement.Product.Api.Configuration;
 using System.ComponentModel.DataAnnotations;
 

@@ -1,4 +1,5 @@
-﻿using OrderManagement.Product.Api.Application.Repositories;
+﻿using OrderManagement.Product.Api.Application.Interfaces;
+using OrderManagement.Product.Api.Application.Repositories;
 
 namespace OrderManagement.Product.Api.Application.Services
 {
