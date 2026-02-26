@@ -7,6 +7,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - gateway
+          - provisioner-api
+          - order-api
+          - category-api
+          - product-api
 
     steps:
       - uses: actions/checkout@v4
@@ -18,10 +27,10 @@ jobs:
           cache: false
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore ${{ matrix.target }}
 
       - name: Build (Release)
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build ${{ matrix.target }} --no-restore --configuration Release
 
       - name: Test (Release)
-        run: dotnet test --no-build --configuration Release --verbosity normal
+        run: dotnet test ${{ matrix.target }} --no-build --configuration Release --verbosity normal
