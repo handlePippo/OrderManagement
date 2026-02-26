@@ -21,13 +21,13 @@ VALUES
   (3, 'Gifts');
 
 -- PRODUCTS
-INSERT INTO `products` (`id`, `category_id`, `sku`, `name`, `description`, `price`)
+INSERT INTO `products` (`id`, `category_id`, `sku`, `name`, `description`, `price`, `stock`)
 VALUES
-  (1, 1, 'PH-001', 'Photo Print 10x15', 'Standard 10x15 print', 0.50),
-  (2, 1, 'PH-002', 'Photo Print 20x30', 'Standard 20x30 print', 1.50),
+  (1, 1, 'PH-001', 'Photo Print 10x15', 'Standard 10x15 print', 0.50, 5),
+  (2, 1, 'PH-002', 'Photo Print 20x30', 'Standard 20x30 print', 1.50, 5),
 
-  (3, 2, 'FR-001', 'Classic Frame', 'Classic black frame', 9.99),
-  (4, 2, 'FR-002', 'Wood Frame',    'Natural wood frame', 14.99),
+  (3, 2, 'FR-001', 'Classic Frame', 'Classic black frame', 9.99, 5),
+  (4, 2, 'FR-002', 'Wood Frame',    'Natural wood frame', 14.99, 5),
 
-  (5, 3, 'GF-001', 'Photo Mug',      'Mug with photo print', 7.99),
-  (6, 3, 'GF-002', 'Photo T-Shirt',  'T-Shirt with photo',   12.99);
+  (5, 3, 'GF-001', 'Photo Mug',      'Mug with photo print', 7.99, 5),
+  (6, 3, 'GF-002', 'Photo T-Shirt',  'T-Shirt with photo',   12.99, 5);
