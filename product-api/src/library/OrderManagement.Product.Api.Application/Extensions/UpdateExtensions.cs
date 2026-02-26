@@ -16,6 +16,12 @@ namespace OrderManagement.Product.Api.Application.Extensions
                 updateCount++;
             }
 
+            if (dto.Stock is int stock && stock > 0)
+            {
+                product.SetStock(stock);
+                updateCount++;
+            }
+
             if (!string.IsNullOrWhiteSpace(dto.Sku))
             {
                 product.SetSku(dto.Sku);

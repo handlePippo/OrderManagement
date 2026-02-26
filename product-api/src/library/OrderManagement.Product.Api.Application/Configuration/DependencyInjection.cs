@@ -12,5 +12,6 @@ public static class DependencyInjection
         services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfile>());
 
         services.AddTransient<IProductService, ProductService>();
+        services.AddTransient<IStockService, StockService>();
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using OrderManagement.Product.Api.Application.DTOs;
 using OrderManagement.Product.Api.Application.Interfaces;
+using OrderManagement.Product.Api.Application.Services;
 using OrderManagement.Product.Api.Controllers;
 
 namespace OrderManagement.Product.Api.Tests.Controllers
@@ -14,10 +15,11 @@ namespace OrderManagement.Product.Api.Tests.Controllers
         private readonly ProductController _sut;
 
         private readonly IProductService _service = Substitute.For<IProductService>();
+        private readonly IStockService _stockService = Substitute.For<IStockService>();
 
         public ProductControllerTests()
         {
-            _sut = new ProductController(_service);
+            _sut = new ProductController(_service, _stockService);
         }
 
         [Fact]
@@ -179,6 +181,38 @@ namespace OrderManagement.Product.Api.Tests.Controllers
             // Assert
             result.Should().BeOfType<NoContentResult>();
             await _service.Received(1).UpdateAsync(id, request, token);
+        }
+
+        [Fact]
+        public async Task IncreaseStockAsync_CallsService_AndReturnsAccepted()
+        {
+            // Arrange
+            var id = _fixture.Create<int>();
+            var qty = _fixture.Create<int>();
+            var token = _fixture.Create<CancellationToken>();
+
+            // Act
+            var result = await _sut.IncreaseStockAsync(id, qty, token);
+
+            // Assert
+            result.Should().BeOfType<AcceptedResult>();
+            await _stockService.Received(1).IncreaseStock(id, qty, token);
+        }
+
+        [Fact]
+        public async Task DecreaseStockAsync_CallsService_AndReturnsAccepted()
+        {
+            // Arrange
+            var id = _fixture.Create<int>();
+            var qty = _fixture.Create<int>();
+            var token = _fixture.Create<CancellationToken>();
+
+            // Act
+            var result = await _sut.DecreaseStockAsync(id, qty, token);
+
+            // Assert
+            result.Should().BeOfType<AcceptedResult>();
+            await _stockService.Received(1).DecreaseStock(id, qty, token);
         }
 
         [Fact]

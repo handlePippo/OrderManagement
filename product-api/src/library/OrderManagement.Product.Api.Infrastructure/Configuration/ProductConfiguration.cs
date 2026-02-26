@@ -49,6 +49,10 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<ProductEntit
             .HasColumnName("modified_at")
             .HasColumnType("datetime(6)");
 
+        b.Property(x => x.Stock)
+             .HasColumnName("stock")
+             .IsRequired();
+
         b.HasIndex(x => x.CategoryId)
             .HasDatabaseName("ix_products_category_id");
 

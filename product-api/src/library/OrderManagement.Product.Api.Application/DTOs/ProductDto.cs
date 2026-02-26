@@ -8,6 +8,7 @@
         public string Name { get; private set; } = null!;
         public string? Description { get; private set; }
         public decimal Price { get; private set; }
+        public int Stock { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? ModifiedAt { get; private set; }
     }

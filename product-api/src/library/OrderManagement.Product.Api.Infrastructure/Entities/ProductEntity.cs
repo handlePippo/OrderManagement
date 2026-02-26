@@ -11,10 +11,23 @@ public sealed class ProductEntity
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
     public decimal Price { get; private set; }
+    public int Stock { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? ModifiedAt { get; private set; }
 
-    private ProductEntity() { } // EF
+    /// <summary>
+    /// Constructor for Automapper / EF.
+    /// </summary>
+    private ProductEntity() { }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="categoryId"></param>
+    /// <param name="sku"></param>
+    /// <param name="name"></param>
+    /// <param name="price"></param>
+    /// <param name="description"></param>
 
     public ProductEntity(int categoryId, string sku, string name, decimal price, string? description = null)
     {

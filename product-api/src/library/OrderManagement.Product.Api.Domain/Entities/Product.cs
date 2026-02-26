@@ -8,6 +8,7 @@ namespace OrderManagement.Product.Api.Domain.Entities
         public string Name { get; private set; } = null!;
         public string? Description { get; private set; }
         public decimal Price { get; private set; }
+        public int Stock {  get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? ModifiedAt { get; private set; }
 
@@ -47,5 +48,22 @@ namespace OrderManagement.Product.Api.Domain.Entities
         public void SetPrice(decimal price) => Price = price;
 
         public void MarkModified() => ModifiedAt = DateTime.UtcNow;
+
+        public void IncreaseStock(int qty)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(qty);
+
+            Stock += qty;
+        }
+
+        public void DecreaseStock(int qty)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(qty);
+
+            Stock -= qty;
+        }
+
+        public void SetStock(int stock) => Stock = stock;
+        public void ClearStock() => Stock = 0;
     }
 }

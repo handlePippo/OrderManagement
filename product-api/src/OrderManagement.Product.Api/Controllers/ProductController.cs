@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderManagement.Product.Api.Application.DTOs;
 using OrderManagement.Product.Api.Application.Interfaces;
+using OrderManagement.Product.Api.Application.Services;
 using OrderManagement.Product.Api.Configuration;
 using System.ComponentModel.DataAnnotations;
 
@@ -15,9 +16,12 @@ namespace OrderManagement.Product.Api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
-        public ProductController(IProductService service)
+        private readonly IStockService _stockService;
+
+        public ProductController(IProductService service, IStockService stockService)
         {
             _service = service;
+            _stockService = stockService;
         }
 
         [HttpGet("list")]
@@ -90,6 +94,32 @@ namespace OrderManagement.Product.Api.Controllers
             await _service.UpdateAsync(id, request, token);
 
             return NoContent();
+        }
+
+        [HttpPut("{id:int}/stock/increase/{qty:int}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> IncreaseStockAsync([FromRoute] int id, [FromRoute] int qty, CancellationToken token)
+        {
+            await _stockService.IncreaseStock(id, qty, token);
+
+            return Accepted();
+        }
+
+        [HttpPut("{id:int}/stock/decrease/{qty:int}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DecreaseStockAsync([FromRoute] int id, [FromRoute] int qty, CancellationToken token)
+        {
+            await _stockService.DecreaseStock(id, qty, token);
+
+            return Accepted();
         }
 
         [HttpDelete("{id:int}")]
