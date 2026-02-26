@@ -12,7 +12,7 @@ public enum OrderStatus
     /// <summary>
     /// Completed order (payed).
     /// </summary>
-    Completed,
+    Submitted,
     /// <summary>
     /// Deleted order.
     /// </summary>

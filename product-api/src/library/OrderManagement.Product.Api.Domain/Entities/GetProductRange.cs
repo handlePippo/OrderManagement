@@ -2,7 +2,7 @@ namespace OrderManagement.Product.Api.Domain.Entities
 {
     public record GetProductRange
     {
-        public required IReadOnlyList<int> OrderIds { get; set; }
+        public IReadOnlyList<int> OrderIds { get; set; }
 
         public GetProductRange(IReadOnlyList<int> orderIds)
         {

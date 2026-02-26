@@ -155,6 +155,19 @@ namespace OrderManagement.Order.Api.Application.Services
             }
         }
 
+        public async Task SubmitAsync(Guid id, CancellationToken token)
+        {
+            var order = await _orderRepository.GetAsync(id, token)
+                ?? throw new InvalidOperationException("The requested order does not exists.");
+
+            ValidateStatus(order);
+
+            order.SetStatus(OrderStatus.Submitted);
+            order.MarkModified();
+
+            await _orderRepository.UpdateAsync(order, token);
+        }
+
         public async Task DeleteAsync(Guid id, CancellationToken token = default)
         {
             var dbOrder = await _orderRepository.GetAsync(id, token)
@@ -163,6 +176,27 @@ namespace OrderManagement.Order.Api.Application.Services
             ValidateStatus(dbOrder);
 
             await ExecuteCoordinatedDeleteAsync(id, token);
+        }
+
+        public async Task DeleteSubmittedAsync(Guid id, CancellationToken token)
+        {
+            var order = await _orderRepository.GetAsync(id, token)
+                ?? throw new InvalidOperationException("The requested order does not exists.");
+
+            if (order.Status != OrderStatus.Submitted)
+            {
+                throw new InvalidOperationException("The order is not in submitted status.");
+            }
+
+            if (DateTime.Now - order.CreatedAt > TimeSpan.FromHours(24))
+            {
+                throw new InvalidOperationException("It's not possibile to delete a submitted order after 24 hours.");
+            }
+
+            order.SetStatus(OrderStatus.Deleted);
+            order.MarkModified();
+
+            await _orderRepository.UpdateAsync(order, token);
         }
 
         #region UoW handlers

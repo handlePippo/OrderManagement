@@ -26,8 +26,4 @@
       <ProjectReference Include="..\OrderManagement.Product.Api.Domain\OrderManagement.Product.Api.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="HttpClients\" />
-    </ItemGroup>
-
 </Project>

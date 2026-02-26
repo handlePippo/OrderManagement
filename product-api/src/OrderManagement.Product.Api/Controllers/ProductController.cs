@@ -47,7 +47,7 @@ namespace OrderManagement.Product.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ProductDto>> GetAsync([FromRoute] int id, CancellationToken token)
         {
-            var dto = await _service.GetByIdAsync(id, token);
+            var dto = await _service.GetAsync(id, token);
 
             if (dto is null)
             {
@@ -74,7 +74,7 @@ namespace OrderManagement.Product.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ProductDto>> AddAsync([FromBody][Required] CreateProductDto request, CancellationToken token)
         {
-            await _service.AddAsync(request, token);
+            await _service.CreateAsync(request, token);
 
             return Created();
         }

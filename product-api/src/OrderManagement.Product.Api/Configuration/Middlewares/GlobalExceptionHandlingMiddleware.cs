@@ -27,7 +27,7 @@ namespace OrderManagement.Product.Api.Configuration.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception");
+                _logger.LogError(ex, "{message}", ex.Message);
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/problem+json";
@@ -37,6 +37,7 @@ namespace OrderManagement.Product.Api.Configuration.Middlewares
                     Title = "An unexpected error occurred",
                     Status = StatusCodes.Status500InternalServerError,
                     Detail = ex.Message,
+                    Type = ex.GetType().Name
                 };
 
                 await context.Response.WriteAsJsonAsync(problem);

@@ -42,7 +42,7 @@ namespace OrderManagement.Product.Api.Application.Services
             return _mapper.Map<IReadOnlyList<ProductDto>>(products);
         }
 
-        public async Task<ProductDto?> GetByIdAsync(int id, CancellationToken token)
+        public async Task<ProductDto?> GetAsync(int id, CancellationToken token)
         {
             var product = await _repository.GetAsync(id, token);
             if (product is null)
@@ -53,7 +53,7 @@ namespace OrderManagement.Product.Api.Application.Services
             return _mapper.Map<ProductDto>(product);
         }
 
-        public async Task AddAsync(CreateProductDto dto, CancellationToken token)
+        public async Task CreateAsync(CreateProductDto dto, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
