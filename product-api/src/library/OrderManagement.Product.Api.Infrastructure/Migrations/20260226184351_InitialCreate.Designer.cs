@@ -12,7 +12,7 @@ using OrderManagement.Product.Api.Infrastructure.Configuration;
 namespace OrderManagement.Product.Api.Infrastructure.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20260226171548_InitialCreate")]
+    [Migration("20260226184351_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -69,6 +69,10 @@ namespace OrderManagement.Product.Api.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)")
                         .HasColumnName("sku");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int")
+                        .HasColumnName("stock");
 
                     b.HasKey("Id");
 

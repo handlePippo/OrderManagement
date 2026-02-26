@@ -18,4 +18,7 @@ public record CreateProductDto
 
     [Required]
     public required decimal Price { get; set; }
+
+    [Required]
+    public int Stock { get; set; }
 }

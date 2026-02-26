@@ -29,6 +29,7 @@ namespace OrderManagement.Product.Api.Infrastructure.Migrations
                     description = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    stock = table.Column<int>(type: "int", nullable: false),
                     created_at = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
                     modified_at = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },

@@ -67,6 +67,10 @@ namespace OrderManagement.Product.Api.Infrastructure.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("sku");
 
+                    b.Property<int>("Stock")
+                        .HasColumnType("int")
+                        .HasColumnName("stock");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId")
