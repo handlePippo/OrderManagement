@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\library\OrderManagement.Order.Api.Application\OrderManagement.Order.Api.Application.csproj" />
+    <ProjectReference Include="..\..\src\library\OrderManagement.Order.Api.Application\OrderManagement.Order.Api.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

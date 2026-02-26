@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\library\OrderManagement.Order.Api.Infrastructure\OrderManagement.Order.Api.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\library\OrderManagement.Order.Api.Infrastructure\OrderManagement.Order.Api.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
