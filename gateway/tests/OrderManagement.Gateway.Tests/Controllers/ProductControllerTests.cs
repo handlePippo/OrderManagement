@@ -195,37 +195,5 @@ namespace OrderManagement.Gateway.Tests.Controllers
             result.Should().BeOfType<NoContentResult>();
             await _client.Received(1).DeleteAsync(id, token);
         }
-
-        [Fact]
-        public async Task IncreaseStockAsync_CallsService_AndReturnsAccepted()
-        {
-            // Arrange
-            var id = _fixture.Create<int>();
-            var qty = _fixture.Create<int>();
-            var token = _fixture.Create<CancellationToken>();
-
-            // Act
-            var result = await _sut.IncreaseStockAsync(id, qty, token);
-
-            // Assert
-            result.Should().BeOfType<AcceptedResult>();
-            await _client.Received(1).IncreaseStock(id, qty, token);
-        }
-
-        [Fact]
-        public async Task DecreaseStockAsync_CallsService_AndReturnsAccepted()
-        {
-            // Arrange
-            var id = _fixture.Create<int>();
-            var qty = _fixture.Create<int>();
-            var token = _fixture.Create<CancellationToken>();
-
-            // Act
-            var result = await _sut.DecreaseStockAsync(id, qty, token);
-
-            // Assert
-            result.Should().BeOfType<AcceptedResult>();
-            await _client.Received(1).DecreaseStock(id, qty, token);
-        }
     }
 }

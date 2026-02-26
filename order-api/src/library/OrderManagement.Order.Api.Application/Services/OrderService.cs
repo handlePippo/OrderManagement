@@ -121,7 +121,7 @@ namespace OrderManagement.Order.Api.Application.Services
             var order = OrderFactory.Create(CurrentUserId, shippingAddress, normalizedOrder.SubTotal, normalizedOrder.Total);
             var orderItems = _normalizer.NormalizeOrderItems(order, normalizedOrder.Products, normalizedOrder.OrderItemsToBeProcessed);
 
-            await ExecuteCoordinatedCreateAsync(order, orderItems, token);
+            await ExecuteCoordinatedCreateAsync(order, orderItems, normalizedOrder.ProductStock, token);
         }
 
         public async Task UpdateAsync(Guid id, UpdateOrderDto dto, CancellationToken token)
@@ -138,14 +138,14 @@ namespace OrderManagement.Order.Api.Application.Services
                 throw new InvalidOperationException("Items list cannot be empty.");
             }
 
-            var (orderItems, executeUpdate) = await UpdateAsync(dto, order, token);
+            var (orderItems, stock, oldStock, executeUpdate) = await UpdateAsync(dto, order, token);
 
             if (executeUpdate)
             {
                 await using var tx = await _unitOfWork.BeginTransactionAsync(token);
                 try
                 {
-                    await ExecuteCoordinatedUpdateAsync(order, orderItems, token);
+                    await ExecuteCoordinatedUpdateAsync(order, orderItems, stock, oldStock, token);
                 }
                 catch
                 {
@@ -175,7 +175,9 @@ namespace OrderManagement.Order.Api.Application.Services
 
             ValidateStatus(dbOrder);
 
-            await ExecuteCoordinatedDeleteAsync(id, token);
+            var stock = await GetOldProductStockToUpdateAsync(dbOrder, token);
+
+            await ExecuteCoordinatedDeleteAsync(id, stock, token);
         }
 
         public async Task DeleteSubmittedAsync(Guid id, CancellationToken token)
@@ -201,13 +203,14 @@ namespace OrderManagement.Order.Api.Application.Services
 
         #region UoW handlers
 
-        private async Task ExecuteCoordinatedCreateAsync(Domain.Entities.Order order, IReadOnlyList<OrderItem> orderItemsToBeUpdated, CancellationToken token)
+        private async Task ExecuteCoordinatedCreateAsync(Domain.Entities.Order order, IReadOnlyList<OrderItem> orderItemsToBeUpdated, ProductStock stockUpdate, CancellationToken token)
         {
             await using var tx = await _unitOfWork.BeginTransactionAsync(token);
             try
             {
                 await _orderRepository.AddAsync(order, token);
                 await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
+                await _productApiClient.DecreaseStock(stockUpdate, token);
 
                 await _unitOfWork.SaveChangesAsync(token);
                 await _unitOfWork.CommitAsync(token);
@@ -219,27 +222,31 @@ namespace OrderManagement.Order.Api.Application.Services
             }
         }
 
-        private async Task ExecuteCoordinatedUpdateAsync(Domain.Entities.Order order, IReadOnlyList<OrderItem> orderItemsToBeUpdated, CancellationToken token)
+        private async Task ExecuteCoordinatedUpdateAsync(Domain.Entities.Order order, IReadOnlyList<OrderItem> orderItemsToBeUpdated, ProductStock oldStockToUpdate, ProductStock newStockToUpdate, CancellationToken token)
         {
             await _orderRepository.UpdateAsync(order, token);
 
             if (orderItemsToBeUpdated?.Count > 0)
             {
                 await _orderItemRepository.DeleteRangeByOrderIdAsync(order.Id, token);
+                await _productApiClient.IncreaseStock(oldStockToUpdate, token);
+
                 await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
+                await _productApiClient.DecreaseStock(newStockToUpdate, token);
             }
 
             await _unitOfWork.SaveChangesAsync(token);
             await _unitOfWork.CommitAsync(token);
         }
 
-        private async Task ExecuteCoordinatedDeleteAsync(Guid orderId, CancellationToken token)
+        private async Task ExecuteCoordinatedDeleteAsync(Guid orderId, ProductStock stockUpdate, CancellationToken token)
         {
             await using var tx = await _unitOfWork.BeginTransactionAsync(token);
             try
             {
                 await _orderItemRepository.DeleteRangeByOrderIdAsync(orderId, token);
                 await _orderRepository.DeleteAsync(orderId, token);
+                await _productApiClient.IncreaseStock(stockUpdate, token);
 
                 await _unitOfWork.SaveChangesAsync(token);
                 await _unitOfWork.CommitAsync(token);
@@ -255,7 +262,7 @@ namespace OrderManagement.Order.Api.Application.Services
 
         #region Private Methods
 
-        private async Task<(IReadOnlyList<OrderItem>, bool)> UpdateAsync(UpdateOrderDto dto, Domain.Entities.Order order, CancellationToken token)
+        private async Task<(IReadOnlyList<OrderItem>, ProductStock, ProductStock, bool)> UpdateAsync(UpdateOrderDto dto, Domain.Entities.Order order, CancellationToken token)
         {
             IReadOnlyList<OrderItem> orderItemsToBeUpdated = [];
             var executeUpdate = false;
@@ -275,7 +282,57 @@ namespace OrderManagement.Order.Api.Application.Services
                 executeUpdate = true;
             }
 
-            return (orderItemsToBeUpdated, executeUpdate);
+            ProductStock oldStockToUpdate = null!;
+            ProductStock newStockToUpdate = null!;
+            if (executeUpdate)
+            {
+                var stockTask = GetOldProductStockToUpdateAsync(order, token);
+                var oldStockTask = GetNewProductStockToUpdateAsync(orderItemsToBeUpdated, token);
+
+                await Task.WhenAll(stockTask, oldStockTask);
+
+                oldStockToUpdate = stockTask.GetAwaiter().GetResult();
+                newStockToUpdate = oldStockTask.GetAwaiter().GetResult();
+            }
+
+            return (orderItemsToBeUpdated, oldStockToUpdate, newStockToUpdate, executeUpdate);
+        }
+
+        private async Task<ProductStock> GetOldProductStockToUpdateAsync(Domain.Entities.Order order, CancellationToken token)
+        {
+            var orderItems = await _orderItemRepository.GetRangeByOrderIdAsync(order.Id, token);
+            var productsToUpdate = orderItems.ToDictionary(o => o.ProductId, b => b.Quantity);
+            var products = await _productApiClient.GetProductsAsync(new ProductRange([.. productsToUpdate.Keys]), token);
+
+            var stock = new ProductStock();
+            foreach (var product in products)
+            {
+                stock.Lines.Add(new ProductStockLine
+                {
+                    ProductId = product.Id,
+                    Quantity = productsToUpdate[product.Id]
+                });
+            }
+
+            return stock;
+        }
+
+        private async Task<ProductStock> GetNewProductStockToUpdateAsync(IReadOnlyList<OrderItem> orderItems, CancellationToken token)
+        {
+            var productsToUpdate = orderItems.ToDictionary(o => o.ProductId, b => b.Quantity);
+            var products = await _productApiClient.GetProductsAsync(new ProductRange([.. productsToUpdate.Keys]), token);
+
+            var stock = new ProductStock();
+            foreach (var product in products)
+            {
+                stock.Lines.Add(new ProductStockLine
+                {
+                    ProductId = product.Id,
+                    Quantity = productsToUpdate[product.Id]
+                });
+            }
+
+            return stock;
         }
 
         private async Task<NormalizedOrder> NormalizeOrderAsync(CreateOrderDto requestDto, CancellationToken token)
@@ -292,14 +349,15 @@ namespace OrderManagement.Order.Api.Application.Services
 
             var products = await _productApiClient.GetProductsAsync(new ProductRange(bag.ProductIds), token);
 
-            var (subTotal, total) = _normalizer.NormalizeOrderItemsCalculations(products, bag.OrderItems);
+            var (subTotal, total, oldProductStockToUpdate) = _normalizer.NormalizeOrderItemsCalculations(products, bag.OrderItems);
 
             return new NormalizedOrder() with
             {
                 SubTotal = subTotal,
                 Total = total,
                 Products = products,
-                OrderItemsToBeProcessed = bag.OrderItemsByIdAndQty
+                OrderItemsToBeProcessed = bag.OrderItemsByIdAndQty,
+                ProductStock = oldProductStockToUpdate
             };
         }
 

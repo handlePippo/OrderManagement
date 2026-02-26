@@ -25,7 +25,7 @@ namespace OrderManagement.Product.Api.Application.Configuration.Automapper
                 .ForMember(m => m.CreatedAt, opt => opt.Ignore())
                 .ForMember(m => m.ModifiedAt, opt => opt.Ignore());
 
-            CreateMap<GetProductRangeDto, GetProductRange>();
+            CreateMap<GetProductRangeDto, ProductRange>();
         }
     }
 }

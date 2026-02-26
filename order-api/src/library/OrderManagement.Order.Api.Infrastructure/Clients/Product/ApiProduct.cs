@@ -1,4 +1,6 @@
-﻿namespace OrderManagement.Order.Api.Infrastructure.Clients.Product;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace OrderManagement.Order.Api.Infrastructure.Clients.Product;
 
 public sealed class ApiProduct
 {

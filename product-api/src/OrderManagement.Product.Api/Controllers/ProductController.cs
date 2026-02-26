@@ -95,28 +95,26 @@ namespace OrderManagement.Product.Api.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id:int}/stock/increase/{qty:int}")]
-        [Authorize(Roles = UserRoles.Admin)]
+        [HttpPut("stock/increase")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> IncreaseStockAsync([FromRoute] int id, [FromRoute] int qty, CancellationToken token)
+        public async Task<IActionResult> IncreaseStockAsync([FromBody][Required] UpdateStockDto dto, CancellationToken token)
         {
-            await _stockService.IncreaseStock(id, qty, token);
+            await _stockService.IncreaseStock(dto, token);
 
             return Accepted();
         }
 
-        [HttpPut("{id:int}/stock/decrease/{qty:int}")]
-        [Authorize(Roles = UserRoles.Admin)]
+        [HttpPut("stock/decrease")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DecreaseStockAsync([FromRoute] int id, [FromRoute] int qty, CancellationToken token)
+        public async Task<IActionResult> DecreaseStockAsync([FromBody][Required] UpdateStockDto dto, CancellationToken token)
         {
-            await _stockService.DecreaseStock(id, qty, token);
+            await _stockService.DecreaseStock(dto, token);
 
             return Accepted();
         }

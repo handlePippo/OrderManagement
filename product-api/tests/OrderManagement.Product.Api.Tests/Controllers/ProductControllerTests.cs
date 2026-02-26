@@ -183,36 +183,35 @@ namespace OrderManagement.Product.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task IncreaseStockAsync_CallsService_AndReturnsAccepted()
+        public async Task IncreaseStockAsync_CallsStockService_AndReturnsAccepted()
         {
             // Arrange
-            var id = _fixture.Create<int>();
-            var qty = _fixture.Create<int>();
             var token = _fixture.Create<CancellationToken>();
+            var dto = _fixture.Create<UpdateStockDto>();
 
             // Act
-            var result = await _sut.IncreaseStockAsync(id, qty, token);
+            var result = await _sut.IncreaseStockAsync(dto, token);
 
             // Assert
             result.Should().BeOfType<AcceptedResult>();
-            await _stockService.Received(1).IncreaseStock(id, qty, token);
+            await _stockService.Received(1).IncreaseStock(dto, token);
         }
 
         [Fact]
-        public async Task DecreaseStockAsync_CallsService_AndReturnsAccepted()
+        public async Task DecreaseStockAsync_CallsStockService_AndReturnsAccepted()
         {
             // Arrange
-            var id = _fixture.Create<int>();
-            var qty = _fixture.Create<int>();
             var token = _fixture.Create<CancellationToken>();
+            var dto = _fixture.Create<UpdateStockDto>();
 
             // Act
-            var result = await _sut.DecreaseStockAsync(id, qty, token);
+            var result = await _sut.DecreaseStockAsync(dto, token);
 
             // Assert
             result.Should().BeOfType<AcceptedResult>();
-            await _stockService.Received(1).DecreaseStock(id, qty, token);
+            await _stockService.Received(1).DecreaseStock(dto, token);
         }
+
 
         [Fact]
         public async Task DeleteAsync_CallsClientAndReturnsNoContent()

@@ -202,7 +202,7 @@ namespace OrderManagement.Order.Api.Application.Tests.Services
             var tot = p1Total + p2Total;
 
             // Act
-            var (subTotal, total) = _sut.NormalizeOrderItemsCalculations(products, items);
+            var (subTotal, total, _) = _sut.NormalizeOrderItemsCalculations(products, items);
 
             // Assert
             subTotal.Should().Be(tot);

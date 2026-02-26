@@ -36,4 +36,26 @@ public sealed class ProductApiClient : IProductApiClient
             .ToList()!
             .AsReadOnly();
     }
+
+    public async Task IncreaseStock(ProductStock stock, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/products/stock/increase", stock, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException($"Product API failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
+        }
+    }
+
+    public async Task DecreaseStock(ProductStock stock, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/products/stock/decrease", stock, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException($"Product API failed: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
+        }
+    }
 }

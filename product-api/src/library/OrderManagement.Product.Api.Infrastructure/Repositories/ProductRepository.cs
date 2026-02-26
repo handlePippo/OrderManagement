@@ -43,12 +43,12 @@ public sealed class ProductRepository : IProductRepository
         return entity is null ? null : _mapper.Map<Domain.Entities.Product>(entity);
     }
 
-    public async Task<IReadOnlyList<Domain.Entities.Product>> GetRangeAsync(GetProductRange range, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Domain.Entities.Product>> GetRangeAsync(ProductRange range, CancellationToken cancellationToken = default)
     {
         var entities = await DbContext
                             .Products
                             .AsNoTracking()
-                            .Where(e => range.OrderIds.Contains(e.Id))
+                            .Where(e => range.Ids.Contains(e.Id))
                             .ToListAsync(cancellationToken);
 
         return _mapper.Map<IReadOnlyList<Domain.Entities.Product>>(entities);
@@ -81,6 +81,25 @@ public sealed class ProductRepository : IProductRepository
                             ?? throw new InvalidOperationException($"Product with id {product.Id} not found.");
 
         _mapper.Map(product, entity);
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+    }
+    public async Task UpdateRangeAsync(Dictionary<int, Domain.Entities.Product> productsById, CancellationToken cancellationToken = default)
+    {
+        var entities = await DbContext
+                            .Products
+                            .Where(x => productsById.Keys.Contains(x.Id))
+                            .ToListAsync(cancellationToken);
+
+        foreach (var entity in entities)
+        {
+            if (!productsById.TryGetValue(entity.Id, out var product))
+            {
+                throw new InvalidOperationException($"One or more product not found.");
+            }
+
+            _mapper.Map(product, entity);
+        }
 
         await DbContext.SaveChangesAsync(cancellationToken);
     }

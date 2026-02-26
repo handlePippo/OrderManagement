@@ -100,7 +100,7 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
             _dbContext.Products.AddRange(e1, e2, e3);
             await _dbContext.SaveChangesAsync(default);
 
-            var range = new GetProductRange(new[] { 1, 3 });
+            var range = new ProductRange(new[] { 1, 3 });
 
             var mapped = _fixture.CreateMany<Domain.Entities.Product>(2).ToList().AsReadOnly();
 

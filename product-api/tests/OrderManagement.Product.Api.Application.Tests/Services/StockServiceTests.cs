@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
-using AutoMapper;
 using FluentAssertions;
 using NSubstitute;
+using OrderManagement.Product.Api.Application.DTOs;
 using OrderManagement.Product.Api.Application.Repositories;
 using OrderManagement.Product.Api.Application.Services;
 
@@ -11,118 +11,175 @@ namespace OrderManagement.Product.Api.Application.Tests.Services
     {
         private readonly Fixture _fixture = new();
         private readonly StockService _sut;
-        private readonly IMapper _mapper = Substitute.For<IMapper>();
         private readonly IProductRepository _repository = Substitute.For<IProductRepository>();
 
         public StockServiceTests()
         {
-            _fixture.Inject(_mapper);
             _fixture.Inject(_repository);
-
             _sut = _fixture.Create<StockService>();
         }
 
         [Fact]
-        public async Task DecreaseStock_WhenProductNotFound_Throws()
+        public async Task DecreaseStock_WhenRangeNotFound_Throws()
         {
             // Arrange
-            var productId = _fixture.Create<int>();
-            var qty = 1;
+            var dto = new UpdateStockDto
+            {
+                Lines = new List<StockLine>()
+                {
+                    new() { ProductId = _fixture.Create<int>(), Quantity = 1 }
+                }
+            };
 
-            _repository.GetAsync(productId, default).Returns((Domain.Entities.Product?)null);
-
-            // Act & Assert
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.DecreaseStock(productId, qty, default));
-            ex.Message.Should().Be($"Product {productId} not found.");
-
-            await _repository.DidNotReceiveWithAnyArgs().UpdateAsync(default!, default);
-        }
-
-        [Fact]
-        public async Task DecreaseStock_WhenStockIsZero_Throws()
-        {
-            // Arrange
-            var productId = _fixture.Create<int>();
-            var qty = 1;
-
-            var product = CreateProductWithStock(stock: 0);
-            _repository.GetAsync(productId, default).Returns(product);
-
-            // Act & Assert
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.DecreaseStock(productId, qty, default));
-            ex.Message.Should().Be($"Product {productId} is already ended.");
-
-            await _repository.DidNotReceiveWithAnyArgs().UpdateAsync(default!, default);
-        }
-
-        [Fact]
-        public async Task DecreaseStock_WhenQuantityConsumesAllStock_ClearsStock_AndUpdates()
-        {
-            // Arrange
-            var productId = _fixture.Create<int>();
-
-            // stock 5, qty 5 -> stock-qty == 0 => ClearStock + DecreaseStock
-            var product = CreateProductWithStock(stock: 5);
-            _repository.GetAsync(productId, default).Returns(product);
+            _repository.GetRangeAsync(Arg.Any<Domain.Entities.ProductRange>(), default).Returns((IReadOnlyList<Domain.Entities.Product>?)null!);
 
             // Act
-            await _sut.DecreaseStock(productId, quantity: 5, token: default);
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.DecreaseStock(dto, default));
 
             // Assert
-            await _repository.Received(1).UpdateAsync(Arg.Is<Domain.Entities.Product>(p => p.Stock == 0), default);
+            ex.Message.Should().Be("One or more product not found.");
+            await _repository.DidNotReceiveWithAnyArgs().UpdateRangeAsync(default!, default);
         }
 
         [Fact]
-        public async Task DecreaseStock_WhenQuantityLessThanStock_Decreases_AndUpdates()
+        public async Task DecreaseStock_WhenStockIsZero_Throws_AndDoesNotUpdate()
         {
             // Arrange
             var productId = _fixture.Create<int>();
 
-            var product = CreateProductWithStock(stock: 10);
-            _repository.GetAsync(productId, default).Returns(product);
+            var dto = new UpdateStockDto
+            {
+                Lines = new List<StockLine>()
+                {
+                    new() { ProductId = productId, Quantity = 1 }
+                }
+            };
+
+            var product = CreateProductWithIdAndStock(productId, stock: 0);
+
+            _repository.GetRangeAsync(Arg.Any<Domain.Entities.ProductRange>(), default)
+                       .Returns(new List<Domain.Entities.Product> { product });
 
             // Act
-            await _sut.DecreaseStock(productId, quantity: 3, token: default);
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.DecreaseStock(dto, default));
 
             // Assert
-            await _repository.Received(1).UpdateAsync(Arg.Is<Domain.Entities.Product>(p => p.Stock == 7), default);
+            ex.Message.Should().Be($"Product {productId} is not avalaible.");
+            await _repository.DidNotReceiveWithAnyArgs().UpdateRangeAsync(default!, default);
         }
 
         [Fact]
-        public async Task IncreaseStock_WhenProductNotFound_Throws()
-        {
-            // Arrange
-            var productId = _fixture.Create<int>();
-            var qty = 2;
-
-            _repository.GetAsync(productId, default).Returns((Domain.Entities.Product?)null);
-
-            // Act & Assert
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.IncreaseStock(productId, qty, default));
-            ex.Message.Should().Be($"Product {productId} not found.");
-
-            await _repository.DidNotReceiveWithAnyArgs().UpdateAsync(default!, default);
-        }
-
-        [Fact]
-        public async Task IncreaseStock_Increases_AndUpdates()
+        public async Task DecreaseStock_WhenQuantityConsumesAllStock_ClearsStock_AndUpdatesRange()
         {
             // Arrange
             var productId = _fixture.Create<int>();
 
-            var product = CreateProductWithStock(stock: 5);
-            _repository.GetAsync(productId, default).Returns(product);
+            var dto = new UpdateStockDto
+            {
+                Lines = new List<StockLine>()
+                {
+                    new() { ProductId = productId, Quantity = 5 }
+                }
+            };
+
+            var product = CreateProductWithIdAndStock(productId, stock: 5);
+
+            _repository.GetRangeAsync(Arg.Any<Domain.Entities.ProductRange>(), default)
+                       .Returns(new List<Domain.Entities.Product> { product });
 
             // Act
-            await _sut.IncreaseStock(productId, quantity: 4, token: default);
+            await _sut.DecreaseStock(dto, default);
 
-            // Assert
-            await _repository.Received(1).UpdateAsync(Arg.Is<Domain.Entities.Product>(p => p.Stock == 9), default);
+            // Assert: repo riceve dict con product aggiornato a stock 0
+            await _repository.Received(1).UpdateRangeAsync(
+                Arg.Is<Dictionary<int, Domain.Entities.Product>>(d =>
+                    d.ContainsKey(productId) && d[productId].Stock == 0),
+                default);
         }
 
-        private Domain.Entities.Product CreateProductWithStock(int stock)
+        [Fact]
+        public async Task DecreaseStock_WhenQuantityLessThanStock_Decreases_AndUpdatesRange()
         {
-            var p = _fixture.Create<Domain.Entities.Product>();
+            // Arrange
+            var productId = _fixture.Create<int>();
+
+            var dto = new UpdateStockDto
+            {
+                Lines = new List<StockLine> ()
+                {
+                    new() { ProductId = productId, Quantity = 3 }
+                }
+            };
+
+            var product = CreateProductWithIdAndStock(productId, stock: 10);
+
+            _repository.GetRangeAsync(Arg.Any<Domain.Entities.ProductRange>(), default)
+                       .Returns(new List<Domain.Entities.Product> { product });
+
+            // Act
+            await _sut.DecreaseStock(dto, default);
+
+            // Assert
+            await _repository.Received(1).UpdateRangeAsync(
+                Arg.Is<Dictionary<int, Domain.Entities.Product>>(d =>
+                    d.ContainsKey(productId) && d[productId].Stock == 7),
+                default);
+        }
+
+        [Fact]
+        public async Task IncreaseStock_WhenRangeNotFound_Throws()
+        {
+            // Arrange
+            var dto = new UpdateStockDto
+            {
+                Lines = new List<StockLine>()
+                {
+                    new() { ProductId = _fixture.Create<int>(), Quantity = 2 }
+                }
+            };
+
+            _repository.GetRangeAsync(Arg.Any<Domain.Entities.ProductRange>(), default).Returns((IReadOnlyList<Domain.Entities.Product>?)null!);
+
+            // Act
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.IncreaseStock(dto, default));
+
+            // Assert
+            ex.Message.Should().Be("One or more product not found.");
+            await _repository.DidNotReceiveWithAnyArgs().UpdateRangeAsync(default!, default);
+        }
+
+        [Fact]
+        public async Task IncreaseStock_Increases_AndUpdatesRange()
+        {
+            // Arrange
+            var productId = _fixture.Create<int>();
+
+            var dto = new UpdateStockDto
+            {
+                Lines = new List<StockLine>()
+                {
+                    new() { ProductId = productId, Quantity = 4 }
+                }
+            };
+
+            var product = CreateProductWithIdAndStock(productId, stock: 5);
+
+            _repository.GetRangeAsync(Arg.Any<Domain.Entities.ProductRange>(), default)
+                       .Returns(new List<Domain.Entities.Product> { product });
+
+            // Act
+            await _sut.IncreaseStock(dto, default);
+
+            // Assert
+            await _repository.Received(1).UpdateRangeAsync(
+                Arg.Is<Dictionary<int, Domain.Entities.Product>>(d =>
+                    d.ContainsKey(productId) && d[productId].Stock == 9),
+                default);
+        }
+
+        private Domain.Entities.Product CreateProductWithIdAndStock(int id, int stock)
+        {
+            var p = new Domain.Entities.Product(id);
             p.SetStock(stock);
             return p;
         }

@@ -8,7 +8,7 @@ namespace OrderManagement.Product.Api.Domain.Entities
         public string Name { get; private set; } = null!;
         public string? Description { get; private set; }
         public decimal Price { get; private set; }
-        public int Stock {  get; private set; }
+        public int Stock { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? ModifiedAt { get; private set; }
 
@@ -58,7 +58,10 @@ namespace OrderManagement.Product.Api.Domain.Entities
 
         public void DecreaseStock(int qty)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(qty);
+            if (Stock - qty <= 0)
+            {
+                ClearStock();
+            }
 
             Stock -= qty;
         }

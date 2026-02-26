@@ -1,6 +1,7 @@
 ﻿using OrderManagement.Order.Api.Application.Factories;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Domain.Entities;
+using OrderManagement.Order.Api.Domain.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 
 namespace OrderManagement.Order.Api.Application.Services
@@ -36,26 +37,33 @@ namespace OrderManagement.Order.Api.Application.Services
             return result;
         }
 
-        public (decimal, decimal) NormalizeOrderItemsCalculations(IReadOnlyList<Product> products, IReadOnlyList<OrderItem> productsToBeAdded)
+        public (decimal, decimal, ProductStock) NormalizeOrderItemsCalculations(IReadOnlyList<Product> products, IReadOnlyList<OrderItem> linesToBeAdded)
         {
             ArgumentNullException.ThrowIfNull(products);
-            ArgumentNullException.ThrowIfNull(productsToBeAdded);
+            ArgumentNullException.ThrowIfNull(linesToBeAdded);
 
             var productsByIdAndPrice = products.ToDictionary(q => q.Id, q => q.Price);
 
+            var productStock = new ProductStock();
             decimal subTotal = 0;
-            foreach (var product in productsToBeAdded)
+            foreach (var line in linesToBeAdded)
             {
-                if (!productsByIdAndPrice.TryGetValue(product.ProductId, out var price))
+                if (!productsByIdAndPrice.TryGetValue(line.ProductId, out var price))
                 {
-                    throw new ValidationException($"Product {product.ProductId} not found.");
+                    throw new ValidationException($"Product {line.ProductId} not found.");
                 }
 
-                subTotal += product.Quantity * price;
+                productStock.Lines.Add(new ProductStockLine
+                {
+                    ProductId = line.ProductId,
+                    Quantity = line.Quantity
+                });
+
+                subTotal += line.Quantity * price;
             }
 
             var total = subTotal;
-            return new(subTotal, total);
+            return new(subTotal, total, productStock);
         }
     }
 }

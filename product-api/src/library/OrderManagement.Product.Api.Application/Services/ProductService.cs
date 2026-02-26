@@ -31,7 +31,7 @@ namespace OrderManagement.Product.Api.Application.Services
 
         public async Task<IReadOnlyList<ProductDto>> GetRangeAsync(GetProductRangeDto dto, CancellationToken token)
         {
-            var range = _mapper.Map<Domain.Entities.GetProductRange>(dto);
+            var range = _mapper.Map<Domain.Entities.ProductRange>(dto);
 
             var products = await _repository.GetRangeAsync(range, token);
             if (products is null)

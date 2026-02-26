@@ -1,8 +1,10 @@
-﻿namespace OrderManagement.Product.Api.Application.Interfaces
+﻿using OrderManagement.Product.Api.Application.DTOs;
+
+namespace OrderManagement.Product.Api.Application.Interfaces
 {
     public interface IStockService
     {
-        Task IncreaseStock(int productId, int quantity, CancellationToken token);
-        Task DecreaseStock(int productId, int quantity, CancellationToken token);
+        Task IncreaseStock(UpdateStockDto dto, CancellationToken token);
+        Task DecreaseStock(UpdateStockDto dto, CancellationToken token);
     }
 }

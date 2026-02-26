@@ -85,12 +85,12 @@ namespace OrderManagement.Product.Api.Application.Tests.Services
             var token = CancellationToken.None;
 
             var dto = _fixture.Create<GetProductRangeDto>();
-            var range = _fixture.Create<GetProductRange>();
+            var range = _fixture.Create<ProductRange>();
 
             var products = _fixture.CreateMany<Domain.Entities.Product>(2).ToList().AsReadOnly();
             var dtos = _fixture.CreateMany<ProductDto>(2).ToList().AsReadOnly();
 
-            _mapper.Map<GetProductRange>(dto).Returns(range);
+            _mapper.Map<ProductRange>(dto).Returns(range);
             _repository.GetRangeAsync(range, token).Returns(products);
             _mapper.Map<IReadOnlyList<ProductDto>>(products).Returns(dtos);
 
@@ -100,7 +100,7 @@ namespace OrderManagement.Product.Api.Application.Tests.Services
             // Assert
             result.Should().BeSameAs(dtos);
 
-            _mapper.Received(1).Map<GetProductRange>(dto);
+            _mapper.Received(1).Map<ProductRange>(dto);
             await _repository.Received(1).GetRangeAsync(range, token);
             _mapper.Received(1).Map<IReadOnlyList<ProductDto>>(products);
         }
@@ -112,9 +112,9 @@ namespace OrderManagement.Product.Api.Application.Tests.Services
             var token = CancellationToken.None;
 
             var dto = _fixture.Create<GetProductRangeDto>();
-            var range = _fixture.Create<GetProductRange>();
+            var range = _fixture.Create<ProductRange>();
 
-            _mapper.Map<GetProductRange>(dto).Returns(range);
+            _mapper.Map<ProductRange>(dto).Returns(range);
             _repository.GetRangeAsync(range, token).Returns((IReadOnlyList<Domain.Entities.Product>?)null!);
 
             // Act
@@ -124,7 +124,7 @@ namespace OrderManagement.Product.Api.Application.Tests.Services
             result.Should().NotBeNull();
             result.Should().BeEmpty();
 
-            _mapper.Received(1).Map<GetProductRange>(dto);
+            _mapper.Received(1).Map<ProductRange>(dto);
             await _repository.Received(1).GetRangeAsync(range, token);
 
             _mapper.DidNotReceiveWithAnyArgs().Map<IReadOnlyList<ProductDto>>(default!);

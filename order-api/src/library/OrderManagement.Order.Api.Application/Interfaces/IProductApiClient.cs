@@ -6,4 +6,6 @@ namespace OrderManagement.Order.Api.Application.Interfaces;
 public interface IProductApiClient
 {
     Task<IReadOnlyList<Product>> GetProductsAsync(ProductRange range, CancellationToken ct);
+    Task IncreaseStock(ProductStock stock, CancellationToken cancellationToken = default);
+    Task DecreaseStock(ProductStock stock, CancellationToken cancellationToken = default);
 }
