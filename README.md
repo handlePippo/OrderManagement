@@ -16,21 +16,6 @@ Database relationships are enforced at the MySQL level while keeping services is
 
 ---
 
-## 🧰 Tech stack
-
-- **Language:** C# (.NET 8)
-- **API:** ASP.NET Core Web API (REST)
-- **Persistence:** Entity Framework Core
-- **Database:** MySQL 8
-- **Authentication:** JWT Bearer
-- **API Documentation:** Swagger / OpenAPI
-- **Containerization & Orchestration:** Docker + Docker Compose
-- **Testing:** xUnit (unit tests)
-
-> Note: each microservice owns its own DbContext and persistence layer, even though all services share the same MySQL instance.
-
----
-
 ## 🏗 Architecture
 
 The solution consists of:
@@ -50,6 +35,52 @@ The solution consists of:
 - ✔ JWT authentication  
 - ✔ Docker-based local orchestration  
 - ✔ Database-level referential integrity across services
+
+---
+
+## 🧰 Tech stack
+
+- **Language:** C# (.NET 8)
+- **API:** ASP.NET Core Web API (REST)
+- **Persistence:** Entity Framework Core
+- **Database:** MySQL 8
+- **Authentication:** JWT Bearer
+- **API Documentation:** Swagger / OpenAPI
+- **Containerization & Orchestration:** Docker + Docker Compose
+- **Testing:** xUnit (unit tests)
+
+> Note: each microservice owns its own DbContext and persistence layer, even though all services share the same MySQL instance.
+
+---
+
+## 🧪 Unit Tests
+
+The solution includes unit tests covering:
+
+- Application services
+- Infrastructure repositories
+- Factories and normalizers
+- Calculation logic
+- Validation rules
+
+### ▶ Run tests locally
+
+From the solution root:
+
+```bash
+dotnet test
+```
+
+## 🐳 Run tests inside Docker
+
+Tests can also be executed inside a container:
+
+```bash
+docker build -t photosi-tests -f Dockerfile.tests .
+docker run --rm photosi-tests
+```
+
+The test container runs dotnet test and exits with the corresponding exit code.
 
 ---
 
