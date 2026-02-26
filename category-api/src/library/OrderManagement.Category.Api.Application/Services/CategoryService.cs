@@ -26,7 +26,7 @@ namespace OrderManagement.Category.Api.Application.Services
             return _mapper.Map<IReadOnlyList<CategoryDto>>(categories);
         }
 
-        public async Task<CategoryDto?> GetByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<CategoryDto?> GetAsync(int id, CancellationToken cancellationToken)
         {
             var category = await _repository.GetAsync(id, cancellationToken);
             if (category is null)
@@ -37,7 +37,7 @@ namespace OrderManagement.Category.Api.Application.Services
             return _mapper.Map<CategoryDto>(category);
         }
 
-        public async Task AddAsync(CreateCategoryDto entity, CancellationToken cancellationToken)
+        public async Task CreateAsync(CreateCategoryDto entity, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(entity);
 

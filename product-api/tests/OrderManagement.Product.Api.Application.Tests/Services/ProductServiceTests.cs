@@ -12,7 +12,7 @@ namespace OrderManagement.Product.Api.Application.Tests.Services
     public sealed class ProductServiceTests
     {
         private readonly Fixture _fixture = new();
-        private ProductService _sut;
+        private readonly ProductService _sut;
         private readonly IMapper _mapper = Substitute.For<IMapper>();
         private readonly IProductRepository _repository = Substitute.For<IProductRepository>();
 

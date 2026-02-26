@@ -5,16 +5,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
-using OrderManagement.Product.Api.Configuration;
+using OrderManagement.Category.Api.Configuration;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
-namespace OrderManagement.Product.Api.Tests.Configuration
+namespace OrderManagement.Category.Api.Tests.Configuration
 {
     public sealed class GatewayHeaderAuthHandlerTests
     {
         private readonly Fixture _fixture = new();
-        private GatewayHeaderAuthHandler _sut;
+        private readonly GatewayHeaderAuthHandler _sut;
         private readonly IOptionsMonitor<AuthenticationSchemeOptions> _optionsMonitor = Substitute.For<IOptionsMonitor<AuthenticationSchemeOptions>>();
         private readonly ILoggerFactory _loggerFactory = Substitute.For<ILoggerFactory>();
         private readonly UrlEncoder _urlEncoder = Substitute.For<UrlEncoder>();

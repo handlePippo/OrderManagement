@@ -14,7 +14,7 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
     {
         private readonly Fixture _fixture = new();
 
-        private ProductRepository _sut;
+        private readonly ProductRepository _sut;
         private readonly IMapper _mapper = Substitute.For<IMapper>();
         private readonly ProductDbContext _dbContext;
 
@@ -38,11 +38,9 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
         public async Task ListAsync_ReturnsMappedProducts()
         {
             // Arrange
-            var ct = CancellationToken.None;
-
             var dbEntities = _fixture.CreateMany<ProductEntity>().ToList();
             _dbContext.Products.AddRange(dbEntities);
-            await _dbContext.SaveChangesAsync(ct);
+            await _dbContext.SaveChangesAsync(default);
 
             var mapped = _fixture.CreateMany<Domain.Entities.Product>(2).ToList().AsReadOnly();
 
@@ -50,7 +48,7 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
                   .Returns(mapped);
 
             // Act
-            var result = await _sut.ListAsync(ct);
+            var result = await _sut.ListAsync(default);
 
             // Assert
             result.Should().BeSameAs(mapped);
@@ -62,11 +60,8 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
         [Fact]
         public async Task GetAsync_WhenNotFound_ReturnsNull()
         {
-            // Arrange
-            var ct = CancellationToken.None;
-
             // Act
-            var result = await _sut.GetAsync(id: 999, ct);
+            var result = await _sut.GetAsync(id: 999, default);
 
             // Assert
             result.Should().BeNull();
@@ -77,12 +72,10 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
         public async Task GetAsync_WhenFound_ReturnsMappedProduct()
         {
             // Arrange
-            var ct = CancellationToken.None;
-
             var entity = _fixture.Build<ProductEntity>().Create();
 
             _dbContext.Products.Add(entity);
-            await _dbContext.SaveChangesAsync(ct);
+            await _dbContext.SaveChangesAsync(default);
 
             var mapped = _fixture.Create<Domain.Entities.Product>();
 
@@ -90,7 +83,7 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
                   .Returns(mapped);
 
             // Act
-            var result = await _sut.GetAsync(entity.Id, ct);
+            var result = await _sut.GetAsync(entity.Id, default);
 
             // Assert
             result.Should().BeSameAs(mapped);
@@ -100,15 +93,12 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
         public async Task GetRangeAsync_FiltersByIds_AndReturnsMappedList()
         {
             // Arrange
-            var ct = CancellationToken.None;
-
-            // seed controllato: serve avere per forza Id 1 e 3
             var e1 = _fixture.Build<ProductEntity>().Create();
             var e2 = _fixture.Build<ProductEntity>().Create();
             var e3 = _fixture.Build<ProductEntity>().Create();
 
             _dbContext.Products.AddRange(e1, e2, e3);
-            await _dbContext.SaveChangesAsync(ct);
+            await _dbContext.SaveChangesAsync(default);
 
             var range = new GetProductRange(new[] { 1, 3 });
 
@@ -118,7 +108,7 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
                   .Returns(mapped);
 
             // Act
-            var result = await _sut.GetRangeAsync(range, ct);
+            var result = await _sut.GetRangeAsync(range, default);
 
             // Assert
             result.Should().BeSameAs(mapped);
@@ -128,15 +118,13 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
         public async Task ExistsAsync_WhenExists_ReturnsTrue()
         {
             // Arrange
-            var ct = CancellationToken.None;
-
             var entity = _fixture.Create<ProductEntity>();
 
             _dbContext.Products.Add(entity);
-            await _dbContext.SaveChangesAsync(ct);
+            await _dbContext.SaveChangesAsync(default);
 
             // Act
-            var result = await _sut.ExistsAsync(entity.Id, ct);
+            var result = await _sut.ExistsAsync(entity.Id, default);
 
             // Assert
             result.Should().BeTrue();
@@ -146,32 +134,28 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
         public async Task AddAsync_AddsMappedEntity_AndPersists()
         {
             // Arrange
-            var ct = CancellationToken.None;
-
             var domain = _fixture.Create<Domain.Entities.Product>();
             var entity = _fixture.Create<ProductEntity>();
 
             _mapper.Map<ProductEntity>(domain).Returns(entity);
 
             // Act
-            await _sut.AddAsync(domain, ct);
+            await _sut.AddAsync(domain, default);
 
             // Assert
             _mapper.Received(1).Map<ProductEntity>(domain);
-            (await _dbContext.Products.CountAsync(ct)).Should().Be(1);
-            (await _dbContext.Products.AnyAsync(x => x.Id == entity.Id, ct)).Should().BeTrue();
+            (await _dbContext.Products.CountAsync(default)).Should().Be(1);
+            (await _dbContext.Products.AnyAsync(x => x.Id == entity.Id, default)).Should().BeTrue();
         }
 
         [Fact]
         public async Task UpdateAsync_WhenEntityNotFound_ThrowsInvalidOperationException()
         {
             // Arrange
-            var ct = CancellationToken.None;
-
             var domain = _fixture.Build<Domain.Entities.Product>().Create();
 
             // Act
-            var act = () => _sut.UpdateAsync(domain, ct);
+            var act = () => _sut.UpdateAsync(domain, default);
 
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>()
@@ -182,12 +166,10 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
         public async Task UpdateAsync_WhenFound_MapsOntoEntity_AndPersists()
         {
             // Arrange
-            var ct = CancellationToken.None;
-
             var existing = _fixture.Create<ProductEntity>();
 
             _dbContext.Products.Add(existing);
-            await _dbContext.SaveChangesAsync(ct);
+            await _dbContext.SaveChangesAsync(default);
 
             var domain = new Domain.Entities.Product(existing.Id);
             domain.SetCategoryId(existing.CategoryId);
@@ -197,24 +179,21 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
             domain.SetPrice(existing.Price);
 
             // Act
-            await _sut.UpdateAsync(domain, ct);
+            await _sut.UpdateAsync(domain, default);
 
             // Assert
             _mapper.Received(1).Map(
                 Arg.Is<Domain.Entities.Product>(p => p.Id == domain.Id),
                 Arg.Is<ProductEntity>(e => e.Id == domain.Id));
 
-            (await _dbContext.Products.AnyAsync(x => x.Id == domain.Id, ct)).Should().BeTrue();
+            (await _dbContext.Products.AnyAsync(x => x.Id == domain.Id, default)).Should().BeTrue();
         }
 
         [Fact]
         public async Task DeleteAsync_WhenEntityNotFound_ThrowsInvalidOperationException()
         {
-            // Arrange
-            var ct = CancellationToken.None;
-
             // Act
-            var act = () => _sut.DeleteAsync(404, ct);
+            var act = () => _sut.DeleteAsync(404, default);
 
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>()
@@ -225,18 +204,16 @@ namespace OrderManagement.Product.Api.Infrastructure.Tests.Repositories
         public async Task DeleteAsync_WhenFound_RemovesEntity_AndPersists()
         {
             // Arrange
-            var ct = CancellationToken.None;
-
             var entity = _fixture.Build<ProductEntity>().Create();
 
             _dbContext.Products.Add(entity);
-            await _dbContext.SaveChangesAsync(ct);
+            await _dbContext.SaveChangesAsync(default);
 
             // Act
-            await _sut.DeleteAsync(entity.Id, ct);
+            await _sut.DeleteAsync(entity.Id, default);
 
             // Assert
-            (await _dbContext.Products.AnyAsync(x => x.Id == entity.Id, ct)).Should().BeFalse();
+            (await _dbContext.Products.AnyAsync(x => x.Id == entity.Id, default)).Should().BeFalse();
         }
     }
 }
