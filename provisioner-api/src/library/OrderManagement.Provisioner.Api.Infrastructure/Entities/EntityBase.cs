@@ -1,4 +1,4 @@
-namespace OrderManagement.Provisioner.Api.Persistence.Entities;
+namespace OrderManagement.Provisioner.Api.Infrastructure.Entities;
 
 /// <summary>
 /// Base entity used to share common properties (e.g id, metadata).
@@ -19,4 +19,18 @@ public abstract class EntityBase
     /// Modified at metadata.
     /// </summary>
     public DateTime? ModifiedAt { get; private set; }
+
+    /// <summary>
+    /// Constructor for Automapper / EF.
+    /// </summary>
+    protected EntityBase() { }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="id"></param>
+    protected EntityBase(int id)
+    {
+        Id = id;
+    }
 }

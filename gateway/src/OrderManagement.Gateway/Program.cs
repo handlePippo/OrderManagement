@@ -1,5 +1,5 @@
 using OrderManagement.Gateway.Configuration;
-using OrderManagement.Gateway.Persistence.Configuration;
+using OrderManagement.Gateway.Infrastructure.Configuration;
 
 namespace OrderManagement.Gateway
 {

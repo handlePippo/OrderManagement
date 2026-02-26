@@ -3,10 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrderManagement.Provisioner.Api.Application.Interfaces;
 using OrderManagement.Provisioner.Api.Application.Repositories;
-using OrderManagement.Provisioner.Api.Persistence.Configuration.Automapper;
-using OrderManagement.Provisioner.Api.Persistence.Repositories;
+using OrderManagement.Provisioner.Api.Infrastructure.Configuration.Automapper;
+using OrderManagement.Provisioner.Api.Infrastructure.Repositories;
 
-namespace OrderManagement.Provisioner.Api.Persistence.Configuration;
+namespace OrderManagement.Provisioner.Api.Infrastructure.Configuration;
 
 public static class DependencyInjection
 {

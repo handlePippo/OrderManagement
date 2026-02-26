@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using OrderManagement.Provisioner.Api.Domain.Entities;
-using OrderManagement.Provisioner.Api.Persistence.Entities;
+using OrderManagement.Provisioner.Api.Infrastructure.Entities;
 
-namespace OrderManagement.Provisioner.Api.Persistence.Configuration.Automapper
+namespace OrderManagement.Provisioner.Api.Infrastructure.Configuration.Automapper
 {
     public sealed class AutoMapperProfile : Profile
     {

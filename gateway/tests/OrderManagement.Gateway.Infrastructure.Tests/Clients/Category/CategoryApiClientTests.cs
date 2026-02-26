@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NSubstitute;
 using OrderManagement.Gateway.Application.DTOs.Categories;
-using OrderManagement.Gateway.Persistence.Clients.Category;
+using OrderManagement.Gateway.Infrastructure.Clients.Category;
 using System.Net;
 using System.Text;
 

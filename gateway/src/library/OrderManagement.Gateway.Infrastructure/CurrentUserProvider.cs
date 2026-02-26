@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using OrderManagement.Gateway.Application.Interfaces;
-using OrderManagement.Gateway.Persistence.Extensions;
+using OrderManagement.Gateway.Infrastructure.Extensions;
 
-namespace OrderManagement.Gateway.Persistence;
+namespace OrderManagement.Gateway.Infrastructure;
 
 public sealed class CurrentUserProvider : ICurrentUserProvider
 {

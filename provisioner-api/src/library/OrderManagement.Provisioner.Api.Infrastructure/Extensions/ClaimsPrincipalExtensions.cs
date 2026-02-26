@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace OrderManagement.Provisioner.Api.Persistence.Extensions
+namespace OrderManagement.Provisioner.Api.Infrastructure.Extensions
 {
     /// <summary>
     /// Claims extensions.

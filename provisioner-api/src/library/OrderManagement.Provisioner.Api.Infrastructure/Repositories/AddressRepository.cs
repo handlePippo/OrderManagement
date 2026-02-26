@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using OrderManagement.Provisioner.Api.Application.Interfaces;
 using OrderManagement.Provisioner.Api.Application.Repositories;
 using OrderManagement.Provisioner.Api.Domain.Entities;
-using OrderManagement.Provisioner.Api.Persistence.Configuration;
-using OrderManagement.Provisioner.Api.Persistence.Entities;
+using OrderManagement.Provisioner.Api.Infrastructure.Configuration;
+using OrderManagement.Provisioner.Api.Infrastructure.Entities;
 
-namespace OrderManagement.Provisioner.Api.Persistence.Repositories;
+namespace OrderManagement.Provisioner.Api.Infrastructure.Repositories;
 
 /// <summary>
 /// Address repository.

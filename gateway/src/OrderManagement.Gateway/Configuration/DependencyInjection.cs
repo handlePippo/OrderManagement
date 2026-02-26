@@ -4,11 +4,11 @@ using Microsoft.OpenApi.Models;
 using OrderManagement.Gateway.Application.Interfaces;
 using OrderManagement.Gateway.Application.Interfaces.Provisioner;
 using OrderManagement.Gateway.Configuration.Middlewares;
-using OrderManagement.Gateway.Persistence.Clients;
-using OrderManagement.Gateway.Persistence.Clients.Category;
-using OrderManagement.Gateway.Persistence.Clients.Order;
-using OrderManagement.Gateway.Persistence.Clients.Product;
-using OrderManagement.Gateway.Persistence.Clients.Provisioner;
+using OrderManagement.Gateway.Infrastructure.Clients;
+using OrderManagement.Gateway.Infrastructure.Clients.Category;
+using OrderManagement.Gateway.Infrastructure.Clients.Order;
+using OrderManagement.Gateway.Infrastructure.Clients.Product;
+using OrderManagement.Gateway.Infrastructure.Clients.Provisioner;
 using System.Security.Claims;
 
 namespace OrderManagement.Gateway.Configuration

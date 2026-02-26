@@ -3,7 +3,7 @@ using OrderManagement.Gateway.Application.Interfaces;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace OrderManagement.Gateway.Persistence.Clients.Category;
+namespace OrderManagement.Gateway.Infrastructure.Clients.Category;
 
 public sealed class CategoryApiClient : ICategoryApiClient
 {

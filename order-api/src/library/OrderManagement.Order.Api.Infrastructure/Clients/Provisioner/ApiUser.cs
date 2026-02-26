@@ -1,4 +1,4 @@
-﻿namespace OrderManagement.Order.Api.Persistence.Clients.Provisioner;
+﻿namespace OrderManagement.Order.Api.Infrastructure.Clients.Provisioner;
 
 public sealed class ApiUser
 {

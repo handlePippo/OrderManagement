@@ -1,7 +1,7 @@
 ﻿using OrderManagement.Order.Api.Application.Configuration;
 using System.Security.Claims;
 
-namespace OrderManagement.Order.Api.Persistence.Extensions
+namespace OrderManagement.Order.Api.Infrastructure.Extensions
 {
     /// <summary>
     /// Claims extensions.

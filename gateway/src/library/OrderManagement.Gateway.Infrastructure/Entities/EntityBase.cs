@@ -1,4 +1,4 @@
-namespace OrderManagement.Gateway.Persistence.Entities;
+namespace OrderManagement.Gateway.Infrastructure.Entities;
 
 /// <summary>
 /// Base entity used to share common properties (e.g id, metadata).

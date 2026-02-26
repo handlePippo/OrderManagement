@@ -2,10 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.Order.Api.Application.Repositories;
 using OrderManagement.Order.Api.Domain.Entities;
-using OrderManagement.Order.Api.Persistence.Configuration;
-using OrderManagement.Order.Api.Persistence.Entities;
+using OrderManagement.Order.Api.Infrastructure.Configuration;
+using OrderManagement.Order.Api.Infrastructure.Entities;
 
-namespace OrderManagement.Order.Api.Persistence.Repositories;
+namespace OrderManagement.Order.Api.Infrastructure.Repositories;
 
 public sealed class OrderItemRepository : IOrderItemRepository
 {

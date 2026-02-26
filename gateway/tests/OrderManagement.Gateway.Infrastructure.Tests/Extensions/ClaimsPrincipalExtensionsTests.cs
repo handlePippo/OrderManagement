@@ -1,6 +1,6 @@
 ﻿using AutoFixture;
 using FluentAssertions;
-using OrderManagement.Gateway.Persistence.Extensions;
+using OrderManagement.Gateway.Infrastructure.Extensions;
 using System.Security.Claims;
 
 namespace OrderManagement.Gateway.Infrastructure.Tests.Extensions

@@ -3,7 +3,7 @@ using OrderManagement.Gateway.Application.DTOs.Provisioners.Users;
 using OrderManagement.Gateway.Application.Interfaces.Provisioner;
 using System.Net.Http.Json;
 
-namespace OrderManagement.Gateway.Persistence.Clients.Provisioner;
+namespace OrderManagement.Gateway.Infrastructure.Clients.Provisioner;
 
 public sealed class ProvisionerApiMasterClient : IProvisionerApiMasterClient
 {

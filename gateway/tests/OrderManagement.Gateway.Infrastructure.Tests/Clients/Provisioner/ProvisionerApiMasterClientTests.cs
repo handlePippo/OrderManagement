@@ -1,13 +1,12 @@
-﻿using System.Net;
-using System.Text;
-using System.Text.Json;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
 using OrderManagement.Gateway.Application.DTOs.Provisioners.Token;
 using OrderManagement.Gateway.Application.DTOs.Provisioners.Users;
-using OrderManagement.Gateway.Persistence.Clients.Provisioner;
-using Xunit;
+using OrderManagement.Gateway.Infrastructure.Clients.Provisioner;
+using System.Net;
+using System.Text;
+using System.Text.Json;
 
 namespace OrderManagement.Gateway.Infrastructure.Tests.Clients.Provisioner
 {

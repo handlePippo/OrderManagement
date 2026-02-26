@@ -3,7 +3,7 @@ using OrderManagement.Gateway.Application.Interfaces;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace OrderManagement.Gateway.Persistence.Clients.Order;
+namespace OrderManagement.Gateway.Infrastructure.Clients.Order;
 
 public sealed class OrderApiClient : IOrderApiClient
 {

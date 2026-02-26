@@ -2,7 +2,6 @@ using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
-using OrderManagement.Gateway.Persistence;
 using System.Security.Claims;
 
 namespace OrderManagement.Gateway.Infrastructure.Tests

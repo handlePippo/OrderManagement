@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Domain.Entities;
+using OrderManagement.Order.Api.Infrastructure.Clients;
 using System.Net.Http.Json;
 
-namespace OrderManagement.Order.Api.Persistence.Clients.Provisioner;
+namespace OrderManagement.Order.Api.Infrastructure.Clients.Provisioner;
 
 public sealed class ProvisionerApiClient : IProvisionerApiClient
 {

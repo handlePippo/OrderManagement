@@ -1,13 +1,11 @@
-﻿using System.Net;
-using System.Text.Json;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Xunit;
 using OrderManagement.Gateway.Configuration.Middlewares;
+using System.Text.Json;
 
 namespace OrderManagement.Gateway.Tests.Configuration.Middlewares
 {

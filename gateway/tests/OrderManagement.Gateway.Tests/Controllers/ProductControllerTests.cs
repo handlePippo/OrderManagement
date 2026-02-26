@@ -5,7 +5,6 @@ using NSubstitute;
 using OrderManagement.Gateway.Application.DTOs.Products;
 using OrderManagement.Gateway.Application.Interfaces;
 using OrderManagement.Gateway.Controllers;
-using Xunit;
 
 namespace OrderManagement.Gateway.Tests.Controllers
 {

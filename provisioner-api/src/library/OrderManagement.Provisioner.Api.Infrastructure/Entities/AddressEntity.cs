@@ -1,4 +1,4 @@
-namespace OrderManagement.Provisioner.Api.Persistence.Entities;
+namespace OrderManagement.Provisioner.Api.Infrastructure.Entities;
 
 /// <summary>
 /// Address entity.
@@ -43,12 +43,11 @@ public sealed class AddressEntity : EntityBase
     /// <param name="city"></param>
     /// <param name="postalCode"></param>
     /// <param name="street"></param>
-    /// <param name="isDefault"></param>
     public AddressEntity(int userId,
         string countryCode,
         string city,
         string postalCode,
-        string street)
+        string street) 
     {
         UserId = userId;
         CountryCode = countryCode;

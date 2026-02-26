@@ -1,12 +1,11 @@
-﻿using System.Net;
-using System.Text;
-using System.Text.Json;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
 using OrderManagement.Gateway.Application.DTOs.Orders;
-using OrderManagement.Gateway.Persistence.Clients.Order;
-using Xunit;
+using OrderManagement.Gateway.Infrastructure.Clients.Order;
+using System.Net;
+using System.Text;
+using System.Text.Json;
 
 namespace OrderManagement.Gateway.Infrastructure.Tests.Clients.Order
 {

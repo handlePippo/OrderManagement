@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.Provisioner.Api.Application.Configuration;
 using OrderManagement.Provisioner.Api.Configuration;
-using OrderManagement.Provisioner.Api.Persistence.Configuration;
+using OrderManagement.Provisioner.Api.Infrastructure.Configuration;
 
 namespace OrderManagement.Provisioner.Api
 {

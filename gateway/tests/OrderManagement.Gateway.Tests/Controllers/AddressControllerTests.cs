@@ -1,5 +1,4 @@
 using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;

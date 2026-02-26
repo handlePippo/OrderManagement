@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace OrderManagement.Gateway.Persistence.Extensions
+namespace OrderManagement.Gateway.Infrastructure.Extensions
 {
     /// <summary>
     /// Claims extensions.

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Configuration.Middlewares;
-using OrderManagement.Order.Api.Persistence.Clients;
-using OrderManagement.Order.Api.Persistence.Clients.Product;
-using OrderManagement.Order.Api.Persistence.Clients.Provisioner;
+using OrderManagement.Order.Api.Infrastructure.Clients;
+using OrderManagement.Order.Api.Infrastructure.Clients.Product;
+using OrderManagement.Order.Api.Infrastructure.Clients.Provisioner;
 
 namespace OrderManagement.Order.Api.Configuration
 {

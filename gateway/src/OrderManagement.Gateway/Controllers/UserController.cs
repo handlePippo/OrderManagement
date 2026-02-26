@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OrderManagement.Gateway.Application.DTOs.Products;
 using OrderManagement.Gateway.Application.DTOs.Provisioners.Users;
 using OrderManagement.Gateway.Application.Interfaces.Provisioner;
 using System.ComponentModel.DataAnnotations;

@@ -1,4 +1,4 @@
-﻿namespace OrderManagement.Order.Api.Persistence.Clients.Product;
+﻿namespace OrderManagement.Order.Api.Infrastructure.Clients.Product;
 
 public sealed class ApiProduct
 {

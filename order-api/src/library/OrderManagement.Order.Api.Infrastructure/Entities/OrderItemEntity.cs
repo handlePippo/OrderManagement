@@ -1,4 +1,4 @@
-namespace OrderManagement.Order.Api.Persistence.Entities;
+namespace OrderManagement.Order.Api.Infrastructure.Entities;
 
 /// <summary>
 /// Order item entity.

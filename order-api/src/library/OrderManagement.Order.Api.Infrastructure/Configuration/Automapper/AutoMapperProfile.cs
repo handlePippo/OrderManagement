@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using OrderManagement.Order.Api.Persistence.Clients.Product;
-using OrderManagement.Order.Api.Persistence.Clients.Provisioner;
-using OrderManagement.Order.Api.Persistence.Entities;
+using OrderManagement.Order.Api.Infrastructure.Clients.Product;
+using OrderManagement.Order.Api.Infrastructure.Clients.Provisioner;
+using OrderManagement.Order.Api.Infrastructure.Entities;
 
-namespace OrderManagement.Order.Api.Persistence.Configuration.Automapper
+namespace OrderManagement.Order.Api.Infrastructure.Configuration.Automapper
 {
     public sealed class AutoMapperProfile : Profile
     {

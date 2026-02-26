@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.Order.Api.Application.Configuration;
 using OrderManagement.Order.Api.Configuration;
-using OrderManagement.Order.Api.Persistence.Configuration;
+using OrderManagement.Order.Api.Infrastructure.Configuration;
 
 namespace OrderManagement.Order.Api
 {

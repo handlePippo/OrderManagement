@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
-using OrderManagement.Gateway.Application.DTOs.Orders;
 using OrderManagement.Gateway.Application.DTOs.Provisioners.Users;
 using OrderManagement.Gateway.Application.Interfaces.Provisioner;
 using OrderManagement.Gateway.Controllers;

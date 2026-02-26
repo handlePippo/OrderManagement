@@ -1,4 +1,4 @@
-namespace OrderManagement.Provisioner.Api.Persistence.Entities;
+namespace OrderManagement.Provisioner.Api.Infrastructure.Entities;
 
 /// <summary>
 /// User entity.
@@ -43,12 +43,12 @@ public sealed class UserEntity : EntityBase
     /// <param name="firstName"></param>
     /// <param name="lastName"></param>
     /// <param name="phoneNumber"></param>
-    public UserEntity(
+    public UserEntity(int id,
         string email,
         string passwordHash,
         string firstName,
         string lastName,
-        string phoneNumber)
+        string phoneNumber) : base(id)
     {
         Email = email;
         PasswordHash = passwordHash;

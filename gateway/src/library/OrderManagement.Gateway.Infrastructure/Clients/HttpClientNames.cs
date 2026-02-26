@@ -1,4 +1,4 @@
-﻿namespace OrderManagement.Gateway.Persistence.Clients;
+﻿namespace OrderManagement.Gateway.Infrastructure.Clients;
 
 public static class HttpClientNames
 {

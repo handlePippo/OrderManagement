@@ -1,7 +1,7 @@
 using OrderManagement.Order.Api.Domain.Entities;
 using OrderManagement.Order.Api.Domain.ValueObjects;
 
-namespace OrderManagement.Order.Api.Persistence.Entities;
+namespace OrderManagement.Order.Api.Infrastructure.Entities;
 
 /// <summary>
 /// Order entity.

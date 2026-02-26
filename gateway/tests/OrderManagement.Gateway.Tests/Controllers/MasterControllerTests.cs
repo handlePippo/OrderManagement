@@ -6,7 +6,6 @@ using OrderManagement.Gateway.Application.DTOs.Provisioners.Token;
 using OrderManagement.Gateway.Application.DTOs.Provisioners.Users;
 using OrderManagement.Gateway.Application.Interfaces.Provisioner;
 using OrderManagement.Gateway.Controllers;
-using Xunit;
 
 namespace OrderManagement.Gateway.Tests.Controllers
 {

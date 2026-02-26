@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using OrderManagement.Order.Api.Application.Interfaces;
-using OrderManagement.Order.Api.Persistence.Configuration;
+using OrderManagement.Order.Api.Infrastructure.Configuration;
 
-namespace OrderManagement.Order.Api.Persistence;
+namespace OrderManagement.Order.Api.Infrastructure;
 
 public sealed class UnitOfWork : IUnitOfWork
 {

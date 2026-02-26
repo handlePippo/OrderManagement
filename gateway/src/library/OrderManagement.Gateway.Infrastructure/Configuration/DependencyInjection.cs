@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrderManagement.Gateway.Application.Interfaces;
 
-namespace OrderManagement.Gateway.Persistence.Configuration;
+namespace OrderManagement.Gateway.Infrastructure.Configuration;
 
 public static class DependencyInjection
 {

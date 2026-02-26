@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NSubstitute;
 using OrderManagement.Gateway.Application.DTOs.Products;
-using OrderManagement.Gateway.Persistence.Clients.Product;
+using OrderManagement.Gateway.Infrastructure.Clients.Product;
 using System.Net;
 using System.Text;
 using System.Text.Json;

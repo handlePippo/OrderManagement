@@ -1,4 +1,4 @@
-namespace OrderManagement.Order.Api.Persistence.Entities;
+namespace OrderManagement.Order.Api.Infrastructure.Entities;
 
 /// <summary>
 /// Base entity used to share common properties (e.g id, metadata).
