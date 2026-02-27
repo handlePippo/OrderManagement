@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using OrderManagement.Order.Api.Application.Bags;
 using OrderManagement.Order.Api.Application.DTOs.Orders;
 using OrderManagement.Order.Api.Application.Extensions;
 using OrderManagement.Order.Api.Application.Factories;
 using OrderManagement.Order.Api.Application.Interfaces;
 using OrderManagement.Order.Api.Application.Repositories;
-using OrderManagement.Order.Api.Application.Struct;
 using OrderManagement.Order.Api.Domain.Entities;
 using OrderManagement.Order.Api.Domain.ValueObjects;
 
@@ -74,14 +74,10 @@ namespace OrderManagement.Order.Api.Application.Services
                 return Array.Empty<OrderDto>()!;
             }
 
+            var lookup = orderItems.ToLookup(x => x.OrderId);
             foreach (var order in orders)
             {
-                var targetOrderItems = orderItems
-                    .Where(i => i.OrderId == order.Id)
-                    .ToList()
-                    .AsReadOnly();
-
-                order.SetItems(targetOrderItems);
+                order.SetItems(lookup[order.Id].ToList());
             }
 
             return _mapper.Map<IReadOnlyList<OrderDto>>(orders);
@@ -138,20 +134,11 @@ namespace OrderManagement.Order.Api.Application.Services
                 throw new InvalidOperationException("Items list cannot be empty.");
             }
 
-            var (orderItems, stock, oldStock, executeUpdate) = await UpdateAsync(dto, order, token);
+            var updateBag = await UpdateAsync(dto, order, token);
 
-            if (executeUpdate)
+            if (updateBag.ExecuteUpdate)
             {
-                await using var tx = await _unitOfWork.BeginTransactionAsync(token);
-                try
-                {
-                    await ExecuteCoordinatedUpdateAsync(order, orderItems, stock, oldStock, token);
-                }
-                catch
-                {
-                    await _unitOfWork.RollbackAsync(token);
-                    throw;
-                }
+                await ExecuteCoordinatedUpdateAsync(order, updateBag, token);
             }
         }
 
@@ -199,6 +186,9 @@ namespace OrderManagement.Order.Api.Application.Services
             order.MarkModified();
 
             await _orderRepository.UpdateAsync(order, token);
+
+            var stock = await GetOldProductStockToUpdateAsync(order, token);
+            await _productApiClient.IncreaseStock(stock, token);
         }
 
         #region UoW handlers
@@ -210,7 +200,6 @@ namespace OrderManagement.Order.Api.Application.Services
             {
                 await _orderRepository.AddAsync(order, token);
                 await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
-                await _productApiClient.DecreaseStock(stockUpdate, token);
 
                 await _unitOfWork.SaveChangesAsync(token);
                 await _unitOfWork.CommitAsync(token);
@@ -220,23 +209,38 @@ namespace OrderManagement.Order.Api.Application.Services
                 await _unitOfWork.RollbackAsync(token);
                 throw;
             }
+
+            await _productApiClient.DecreaseStock(stockUpdate, token);
         }
 
-        private async Task ExecuteCoordinatedUpdateAsync(Domain.Entities.Order order, IReadOnlyList<OrderItem> orderItemsToBeUpdated, ProductStock oldStockToUpdate, ProductStock newStockToUpdate, CancellationToken token)
+        private async Task ExecuteCoordinatedUpdateAsync(Domain.Entities.Order order, UpdateBag bag, CancellationToken token)
         {
-            await _orderRepository.UpdateAsync(order, token);
-
-            if (orderItemsToBeUpdated?.Count > 0)
+            await using var tx = await _unitOfWork.BeginTransactionAsync(token);
+            try
             {
-                await _orderItemRepository.DeleteRangeByOrderIdAsync(order.Id, token);
-                await _productApiClient.IncreaseStock(oldStockToUpdate, token);
+                await _orderRepository.UpdateAsync(order, token);
 
-                await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
-                await _productApiClient.DecreaseStock(newStockToUpdate, token);
+                if (bag.OrderItemsToBeUpdated?.Count > 0)
+                {
+                    await _orderItemRepository.DeleteRangeByOrderIdAsync(order.Id, token);
+                    await _orderItemRepository.AddRangeAsync(bag.OrderItemsToBeUpdated, token);
+                }
+
+                await _unitOfWork.SaveChangesAsync(token);
+                await _unitOfWork.CommitAsync(token);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync(token);
+                throw;
             }
 
-            await _unitOfWork.SaveChangesAsync(token);
-            await _unitOfWork.CommitAsync(token);
+            if (bag.OrderItemsToBeUpdated?.Count > 0)
+            {
+                var increaseTask = _productApiClient.IncreaseStock(bag.OldStockToUpdate, token);
+                var decreaseTask = _productApiClient.DecreaseStock(bag.NewStockToUpdate, token);
+                await Task.WhenAll(increaseTask, decreaseTask);
+            }
         }
 
         private async Task ExecuteCoordinatedDeleteAsync(Guid orderId, ProductStock stockUpdate, CancellationToken token)
@@ -246,7 +250,6 @@ namespace OrderManagement.Order.Api.Application.Services
             {
                 await _orderItemRepository.DeleteRangeByOrderIdAsync(orderId, token);
                 await _orderRepository.DeleteAsync(orderId, token);
-                await _productApiClient.IncreaseStock(stockUpdate, token);
 
                 await _unitOfWork.SaveChangesAsync(token);
                 await _unitOfWork.CommitAsync(token);
@@ -256,13 +259,15 @@ namespace OrderManagement.Order.Api.Application.Services
                 await _unitOfWork.RollbackAsync(token);
                 throw;
             }
+
+            await _productApiClient.IncreaseStock(stockUpdate, token);
         }
 
         #endregion
 
         #region Private Methods
 
-        private async Task<(IReadOnlyList<OrderItem>, ProductStock, ProductStock, bool)> UpdateAsync(UpdateOrderDto dto, Domain.Entities.Order order, CancellationToken token)
+        private async Task<UpdateBag> UpdateAsync(UpdateOrderDto dto, Domain.Entities.Order order, CancellationToken token)
         {
             IReadOnlyList<OrderItem> orderItemsToBeUpdated = [];
             var executeUpdate = false;
@@ -295,8 +300,15 @@ namespace OrderManagement.Order.Api.Application.Services
                 newStockToUpdate = oldStockTask.GetAwaiter().GetResult();
             }
 
-            return (orderItemsToBeUpdated, oldStockToUpdate, newStockToUpdate, executeUpdate);
+            return new UpdateBag() with
+            {
+                OrderItemsToBeUpdated = orderItemsToBeUpdated,
+                OldStockToUpdate = oldStockToUpdate,
+                NewStockToUpdate = newStockToUpdate,
+                ExecuteUpdate = executeUpdate
+            };
         }
+
 
         private async Task<ProductStock> GetOldProductStockToUpdateAsync(Domain.Entities.Order order, CancellationToken token)
         {
@@ -335,13 +347,13 @@ namespace OrderManagement.Order.Api.Application.Services
             return stock;
         }
 
-        private async Task<NormalizedOrder> NormalizeOrderAsync(CreateOrderDto requestDto, CancellationToken token)
+        private async Task<NormalizedOrderBag> NormalizeOrderAsync(CreateOrderDto requestDto, CancellationToken token)
             => await NormalizeAsync(requestDto.Items, token);
 
-        private async Task<NormalizedOrder> NormalizeOrderAsync(UpdateOrderDto requestDto, CancellationToken token)
+        private async Task<NormalizedOrderBag> NormalizeOrderAsync(UpdateOrderDto requestDto, CancellationToken token)
             => await NormalizeAsync(requestDto.Items!, token);
 
-        private async Task<NormalizedOrder> NormalizeAsync(IReadOnlyList<OrderItemProductInfoDto> requestDto, CancellationToken token)
+        private async Task<NormalizedOrderBag> NormalizeAsync(IReadOnlyList<OrderItemProductInfoDto> requestDto, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(requestDto);
 
@@ -351,7 +363,7 @@ namespace OrderManagement.Order.Api.Application.Services
 
             var (subTotal, total, oldProductStockToUpdate) = _normalizer.NormalizeOrderItemsCalculations(products, bag.OrderItems);
 
-            return new NormalizedOrder() with
+            return new NormalizedOrderBag() with
             {
                 SubTotal = subTotal,
                 Total = total,
