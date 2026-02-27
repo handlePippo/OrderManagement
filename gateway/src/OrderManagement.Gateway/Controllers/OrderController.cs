@@ -67,7 +67,7 @@ namespace OrderManagement.Gateway.Controllers
             return Created();
         }
 
-        [HttpPost("submit")]
+        [HttpPost("submit/{id:guid}")]
         [ProducesResponseType(typeof(OrderDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
