@@ -198,8 +198,8 @@ namespace OrderManagement.Order.Api.Application.Services
             await using var tx = await _unitOfWork.BeginTransactionAsync(token);
             try
             {
-                await _orderRepository.AddAsync(order, token);
                 await _orderItemRepository.AddRangeAsync(orderItemsToBeUpdated, token);
+                await _orderRepository.AddAsync(order, token);
 
                 await _unitOfWork.SaveChangesAsync(token);
                 await _unitOfWork.CommitAsync(token);
@@ -218,13 +218,13 @@ namespace OrderManagement.Order.Api.Application.Services
             await using var tx = await _unitOfWork.BeginTransactionAsync(token);
             try
             {
-                await _orderRepository.UpdateAsync(order, token);
-
                 if (bag.OrderItemsToBeUpdated?.Count > 0)
                 {
                     await _orderItemRepository.DeleteRangeByOrderIdAsync(order.Id, token);
                     await _orderItemRepository.AddRangeAsync(bag.OrderItemsToBeUpdated, token);
                 }
+
+                await _orderRepository.UpdateAsync(order, token);
 
                 await _unitOfWork.SaveChangesAsync(token);
                 await _unitOfWork.CommitAsync(token);
