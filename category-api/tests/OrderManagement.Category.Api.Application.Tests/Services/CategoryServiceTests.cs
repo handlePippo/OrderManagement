@@ -5,6 +5,7 @@ using NSubstitute;
 using OrderManagement.Category.Api.Application.DTOs;
 using OrderManagement.Category.Api.Application.Repositories;
 using OrderManagement.Category.Api.Application.Services;
+using OrderManagement.Category.Api.Domain.Pagination;
 
 namespace OrderManagement.Category.Api.Application.Tests.Services
 {
@@ -27,33 +28,40 @@ namespace OrderManagement.Category.Api.Application.Tests.Services
         public async Task ListAsync_WhenRepositoryReturnsNull_ReturnsNull()
         {
             // Arrange
-            _repository.ListAsync(default).Returns((IReadOnlyList<Domain.Entities.Category>?)null!);
+            var paginationDto = _fixture.Create<ListRequestDto>();
+            var pagination = _fixture.Create<ListRequest>();
+
+            _repository.ListAsync(pagination, default).Returns([]);
 
             // Act
-            var result = await _sut.ListAsync(default);
+            var result = await _sut.ListAsync(paginationDto, default);
 
             // Assert
-            result.Should().BeNull();
-            _mapper.DidNotReceiveWithAnyArgs().Map<IReadOnlyList<CategoryDto>>(default!);
+            result.Should().BeEmpty();
+            _mapper.Received(1).Map<ListRequest>(Arg.Any<ListRequestDto>());
+            _mapper.DidNotReceiveWithAnyArgs().Map<IReadOnlyList<CategoryDto>>(Arg.Any<IReadOnlyList<CategoryDto>>());
         }
 
         [Fact]
         public async Task ListAsync_WhenRepositoryReturnsCategories_MapsAndReturnsDtos()
         {
             // Arrange
+            var paginationDto = _fixture.Create<ListRequestDto>();
+
             var categories = _fixture.CreateMany<Domain.Entities.Category>(3).ToList().AsReadOnly();
             var dtos = _fixture.CreateMany<CategoryDto>(3).ToList().AsReadOnly();
 
-            _repository.ListAsync(default).Returns(categories);
+            _repository.ListAsync(Arg.Any<ListRequest>(), default).Returns(categories);
             _mapper.Map<IReadOnlyList<CategoryDto>>(categories).Returns(dtos);
 
             // Act
-            var result = await _sut.ListAsync(default);
+            var result = await _sut.ListAsync(paginationDto, default);
 
             // Assert
             result.Should().BeSameAs(dtos);
-            await _repository.Received(1).ListAsync(default);
-            _mapper.Received(1).Map<IReadOnlyList<CategoryDto>>(categories);
+            await _repository.Received(1).ListAsync(Arg.Any<ListRequest>(), default);
+            _mapper.Received(1).Map<ListRequest>(Arg.Any<ListRequestDto>());
+            _mapper.DidNotReceiveWithAnyArgs().Map<IReadOnlyList<CategoryDto>>(Arg.Any<IReadOnlyList<CategoryDto>>());
         }
 
         [Fact]

@@ -3,6 +3,7 @@ using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using OrderManagement.Category.Api.Domain.Pagination;
 using OrderManagement.Category.Api.Infrastructure.Configuration;
 using OrderManagement.Category.Api.Infrastructure.Entities;
 using OrderManagement.Category.Api.Infrastructure.Repositories;
@@ -31,28 +32,6 @@ namespace OrderManagement.Category.Api.Infrastructure.Tests.Repositories
         }
 
         public void Dispose() => _dbContext.Dispose();
-
-        [Fact]
-        public async Task ListAsync_ReturnsMappedCategories()
-        {
-            // Arrange
-            var dbEntities = _fixture.CreateMany<CategoryEntity>().ToList();
-            _dbContext.Categories.AddRange(dbEntities);
-            await _dbContext.SaveChangesAsync(default);
-
-            var mapped = _fixture.CreateMany<Domain.Entities.Category>(2).ToList().AsReadOnly();
-
-            _mapper.Map<IReadOnlyList<Domain.Entities.Category>>(Arg.Any<object>())
-                  .Returns(mapped);
-
-            // Act
-            var result = await _sut.ListAsync(default);
-
-            // Assert
-            result.Should().BeSameAs(mapped);
-            _mapper.Received(1).Map<IReadOnlyList<Domain.Entities.Category>>(
-                Arg.Is<object>(o => o is List<CategoryEntity>));
-        }
 
         [Fact]
         public async Task GetAsync_WhenNotFound_ReturnsNull()

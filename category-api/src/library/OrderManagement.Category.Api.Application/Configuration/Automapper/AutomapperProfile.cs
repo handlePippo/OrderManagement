@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using OrderManagement.Category.Api.Application.DTOs;
+using OrderManagement.Category.Api.Domain.Pagination;
 
 namespace OrderManagement.Category.Api.Application.Configuration.Automapper
 {
@@ -13,6 +14,8 @@ namespace OrderManagement.Category.Api.Application.Configuration.Automapper
         private void ConfigureCategoryMapping()
         {
             CreateMap<Domain.Entities.Category, CategoryDto>().ReverseMap();
+
+            CreateMap<ListRequestDto, ListRequest>();
 
             CreateMap<CreateCategoryDto, Domain.Entities.Category>()
                 .ForMember(m => m.Id, opt => opt.Ignore())

@@ -3,25 +3,35 @@ using OrderManagement.Category.Api.Application.DTOs;
 using OrderManagement.Category.Api.Application.Extensions;
 using OrderManagement.Category.Api.Application.Interfaces;
 using OrderManagement.Category.Api.Application.Repositories;
+using OrderManagement.Category.Api.Domain.Pagination;
 
 namespace OrderManagement.Category.Api.Application.Services
 {
+    /// <summary>
+    /// Category service.
+    /// </summary>
     public sealed class CategoryService : ICategoryService
     {
         private readonly IMapper _mapper;
         private readonly ICategoryRepository _repository;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="repository"></param>
         public CategoryService(IMapper mapper, ICategoryRepository repository)
         {
             _mapper = mapper;
             _repository = repository;
         }
-        public async Task<IReadOnlyList<CategoryDto>> ListAsync(CancellationToken cancellationToken)
+
+        public Task<bool> ExistsAsync(int id, CancellationToken cancellationToken) => _repository.ExistsAsync(id, cancellationToken);
+
+        public async Task<IReadOnlyList<CategoryDto>> ListAsync(ListRequestDto dto, CancellationToken cancellationToken)
         {
-            var categories = await _repository.ListAsync(cancellationToken);
-            if (categories is null)
-            {
-                return null!;
-            }
+            var pagination = _mapper.Map<ListRequest>(dto);
+            var categories = await _repository.ListAsync(pagination, cancellationToken);
 
             return _mapper.Map<IReadOnlyList<CategoryDto>>(categories);
         }
@@ -46,16 +56,6 @@ namespace OrderManagement.Category.Api.Application.Services
             await _repository.AddAsync(category, cancellationToken);
         }
 
-        public async Task DeleteAsync(int id, CancellationToken cancellationToken)
-        {
-            await _repository.DeleteAsync(id, cancellationToken);
-        }
-
-        public async Task<bool> ExistsAsync(int id, CancellationToken cancellationToken)
-        {
-            return await _repository.ExistsAsync(id, cancellationToken);
-        }
-
         public async Task UpdateAsync(int id, UpdateCategoryDto dto, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(dto);
@@ -65,5 +65,7 @@ namespace OrderManagement.Category.Api.Application.Services
 
             await _repository.UpdateAsync(category, cancellationToken);
         }
+
+        public Task DeleteAsync(int id, CancellationToken cancellationToken) => _repository.DeleteAsync(id, cancellationToken);
     }
 }

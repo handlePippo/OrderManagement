@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.Category.Api.Application.Repositories;
+using OrderManagement.Category.Api.Domain.Pagination;
+using OrderManagement.Category.Api.Domain.Pagination.Extensions;
 using OrderManagement.Category.Api.Infrastructure.Configuration;
 using OrderManagement.Category.Api.Infrastructure.Entities;
 
@@ -22,14 +24,16 @@ public sealed class CategoryRepository : ICategoryRepository
         _mapper = mapper;
     }
 
-    public async Task<IReadOnlyList<Domain.Entities.Category>> ListAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Domain.Entities.Category>> ListAsync(ListRequest pagination, CancellationToken cancellationToken = default)
     {
         var dbEntities = await DbContext
                                 .Categories
                                 .AsNoTracking()
+                                .ApplyOrder(static c => c.Id, pagination.Order)
+                                .ApplyPagination(pagination.Page, pagination.Size)
                                 .ToListAsync(cancellationToken);
 
-        return _mapper.Map<IReadOnlyList<Domain.Entities.Category>>(dbEntities);
+        return _mapper.Map<IReadOnlyList<Domain.Entities.Category>>(dbEntities ?? []);
     }
 
     public async Task<Domain.Entities.Category?> GetAsync(int id, CancellationToken cancellationToken = default)

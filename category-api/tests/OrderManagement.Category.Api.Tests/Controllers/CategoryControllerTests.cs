@@ -24,11 +24,12 @@ namespace OrderManagement.Category.Api.Tests.Controllers
         public async Task ListAsync_WhenClientReturnsNull_ReturnsOkWithEmptyArray()
         {
             // Arrange
-            var token = _fixture.Create<CancellationToken>();
-            _service.ListAsync(token).Returns((IReadOnlyList<CategoryDto>?)null!);
+            var pagination = _fixture.Create<ListRequestDto>();
+
+            _service.ListAsync(pagination, default).Returns([]);
 
             // Act
-            var result = await _sut.ListAsync(token);
+            var result = await _sut.ListAsync(pagination, default);
 
             // Assert
             var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
@@ -36,25 +37,26 @@ namespace OrderManagement.Category.Api.Tests.Controllers
             ok.Value.Should().BeAssignableTo<IReadOnlyList<CategoryDto>>();
             ((IReadOnlyList<CategoryDto>)ok.Value!).Should().BeEmpty();
 
-            await _service.Received(1).ListAsync(token);
+            await _service.Received(1).ListAsync(pagination, default);
         }
 
         [Fact]
         public async Task ListAsync_WhenClientReturnsList_ReturnsOkWithSameList()
         {
             // Arrange
-            var token = _fixture.Create<CancellationToken>();
+            var pagination = _fixture.Create<ListRequestDto>();
+
             var dto = _fixture.CreateMany<CategoryDto>(3).ToArray();
-            _service.ListAsync(token).Returns(dto);
+            _service.ListAsync(pagination, default).Returns(dto);
 
             // Act
-            var result = await _sut.ListAsync(token);
+            var result = await _sut.ListAsync(pagination, default);
 
             // Assert
             var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
             ok.Value.Should().BeSameAs(dto);
 
-            await _service.Received(1).ListAsync(token);
+            await _service.Received(1).ListAsync(pagination, default);
         }
 
         [Fact]
@@ -93,20 +95,35 @@ namespace OrderManagement.Category.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task ExistsAsync_ReturnsOkWithBool()
+        public async Task ExistsAsync_Found_ReturnsOk()
         {
             // Arrange
             var id = _fixture.Create<int>();
             var token = _fixture.Create<CancellationToken>();
-            var exists = _fixture.Create<bool>();
-            _service.ExistsAsync(id, token).Returns(exists);
+            _service.ExistsAsync(id, token).Returns(true);
 
             // Act
             var result = await _sut.ExistsAsync(id, token);
 
             // Assert
-            var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().Be(exists);
+            var ok = result.Should().BeOfType<OkResult>().Subject;
+
+            await _service.Received(1).ExistsAsync(id, token);
+        }
+
+        [Fact]
+        public async Task ExistsAsync_NotFound_ReturnsNotFound()
+        {
+            // Arrange
+            var id = _fixture.Create<int>();
+            var token = _fixture.Create<CancellationToken>();
+            _service.ExistsAsync(id, token).Returns(false);
+
+            // Act
+            var result = await _sut.ExistsAsync(id, token);
+
+            // Assert
+            var ok = result.Should().BeOfType<NotFoundResult>().Subject;
 
             await _service.Received(1).ExistsAsync(id, token);
         }
@@ -122,7 +139,7 @@ namespace OrderManagement.Category.Api.Tests.Controllers
             var result = await _sut.AddAsync(request, token);
 
             // Assert
-            result.Result.Should().BeOfType<CreatedResult>();
+            result.Result.Should().BeOfType<StatusCodeResult>();
             await _service.Received(1).CreateAsync(request, token);
         }
 
